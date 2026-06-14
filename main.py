@@ -36,5 +36,5 @@ tickers.append(ticker_symbol_mfst)
 historical_data_mfst = ticker_mfst.history(period="1mo")
 #print(historical_data_mfst)
 for items in tickers:
-    data[items] = historical_data[]
+    data[items] = historical_data
 print(data)
