@@ -1,40 +1,19 @@
 import yfinance as yf
+import pandas as pd
 
-data = {}
-tickers = []
-
-# defines the ticker symbol
-ticker_symbol_apple = "AAPL"
+raw_data = {}
+summary = {}
+tickers = ["AAPL", "MSFT", "GOOGL", "TSLA"]
 
 # create a ticker object 
-ticker = yf.Ticker(ticker_symbol_apple)
-
-print("Apple")
-# historical data
-historical_data = ticker.history(period="1y")
-info = []
-info.append(historical_data) 
-
-
-#basic financials
-financials = ticker.financials
-#print("\n Financials:")
-#print(financials)
-
-#fetch stock actions
-stock_actions = ticker.actions
-#print("\n stock actions")
-#print(stock_actions)
-
-
-
-ticker_symbol_mfst = "MSFT"
-ticker_mfst = yf.Ticker(ticker_symbol_mfst)
-tickers.append(ticker_symbol_apple)
-tickers.append(ticker_symbol_mfst)
-#print("Microsoft")
-historical_data_mfst = ticker_mfst.history(period="1mo")
-#print(historical_data_mfst)
+# store historical raw_data
 for items in tickers:
-    data[items] = historical_data
-print(data)
+    ticker_object = yf.Ticker(items)
+    raw_data[items] = ticker_object.history(period="1y")
+
+for item in raw_data:
+    print(f"Highest closing value for {item} in the last year: ${(raw_data[item]["Close"].max()):.2f}")
+
+
+
+
