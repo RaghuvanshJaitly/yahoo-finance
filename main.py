@@ -3,7 +3,7 @@ import pandas as pd
 
 raw_data = {}
 summary = {}
-tickers = ["AAPL", "MSFT", "GOOGL", "TSLA"]
+tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
 
 # create a ticker object 
 # store historical raw_data
@@ -12,7 +12,14 @@ for items in tickers:
     raw_data[items] = ticker_object.history(period="1y")
 
 for item in raw_data:
-    print(f"Highest closing value for {item} in the last year: ${(raw_data[item]["Close"].max()):.2f}")
+    
+    summary[item] = {"Highest Close":raw_data[item]["Close"].max(),"Lowest Close" : raw_data[item]["Close"].min(),
+                     "Highest Volume": raw_data[item]["Volume"].max(), "Lowest Volume": raw_data[item]["Volume"].min()}
+print("Statistics")
+
+df = (pd.DataFrame(summary)).transpose()
+df.insert(df.index[0], "Tickers", "")
+print(df)
 
 
 
