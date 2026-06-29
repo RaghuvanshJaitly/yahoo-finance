@@ -1,8 +1,16 @@
 import yfinance as yf
 import pandas as pd
 import sqlite3
-#sql connection
-conn = sqlite3.connect('stocks.db')
+
+#connect to database
+def connect_db():
+    try:
+        conn = sqlite3.connect('stocks.db')
+        return conn
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+conn = connect_db()
 
 raw_data = {}
 raw_data_daily = {}
@@ -29,21 +37,19 @@ df_summary = df_summary.reset_index().rename(columns={"index": "Tickers"})
 
 df_daily = pd.concat(raw_data_daily)
 df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
-print(df_daily)
-#write dataframe to database
-df_summary.to_sql(
-    name='stocks_summary', #name of the table
-    con=conn, #database connection object
-    if_exists="replace", #what to do if table already exists
-    index=False #Do not write dataframe index as a seperate
-)
-
-df_daily.to_sql(
-    name='daily_stock_prices',
+# print(df_daily)
+#save dataframe
+def save_dataframe(dataframe: pd.DataFrame, table_name:str, conn:sqlite3.Connection):
+    dataframe.to_sql(
+    name=table_name,
     con=conn,
-    if_exists="replace",
+    if_exists='replace',
     index=False
-)
+    )
+#write data to sql
+save_dataframe(df_summary, 'stocks_summary',conn)
+save_dataframe(df_daily,'daily_stock_prices', conn )
+
 #close connection
 conn.close()
 
