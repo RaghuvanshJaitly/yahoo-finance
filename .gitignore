@@ -3,3 +3,14 @@ __pycache__/
 *.pyc
 stocks.db
 .DS_Store
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
