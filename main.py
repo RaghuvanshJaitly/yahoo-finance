@@ -12,17 +12,17 @@ def connect_db():
 
 conn = connect_db()
 
-raw_data = {}
-raw_data_daily = {}
 summary = {}
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
-
-# create a ticker object 
-# store historical raw_data
-for items in tickers:
-    ticker_object = yf.Ticker(items)
-    raw_data[items] = ticker_object.history(period="5y")
+#downloads stock data
+def download_stock_data(tickers: list)-> dict:
+    raw_data = {}
+    for items in tickers:
+        ticker_object = yf.Ticker(items)
+        raw_data[items] = ticker_object.history(period="5y")
+    return raw_data
     
+raw_data = download_stock_data(tickers)
 for item in raw_data:
     
     summary[item] = {"Highest Close":raw_data[item]["Close"].max(),"Lowest Close" : raw_data[item]["Close"].min(),
@@ -30,7 +30,7 @@ for item in raw_data:
                      "Average Close": raw_data[item]["Close"].mean(), "Average Volume":raw_data[item]["Volume"].mean(),
                      "Median Close": raw_data[item]["Close"].median(), "Standard Deviation of Close": raw_data[item]["Close"].std()
     }
-    
+
 df_summary = (pd.DataFrame(summary)).transpose()
 df_summary = df_summary.reset_index().rename(columns={"index": "Tickers"})
 
@@ -48,6 +48,7 @@ def save_dataframe(dataframe: pd.DataFrame, table_name:str, conn:sqlite3.Connect
 #write data to sql
 save_dataframe(df_summary, 'stocks_summary',conn)
 save_dataframe(df_daily,'daily_stock_prices', conn )
+
 #Read Data from Sqlite
 #get the date with the highest volume for AAPL
 result = pd.read_sql_query("SELECT Date, Volume FROM daily_stock_prices WHERE Tickers = 'AAPL' AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = 'AAPL')", conn)
