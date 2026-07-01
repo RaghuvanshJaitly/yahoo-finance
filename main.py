@@ -36,7 +36,7 @@ df_summary = df_summary.reset_index().rename(columns={"index": "Tickers"})
 
 df_daily = pd.concat(raw_data)
 df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
-# print(df_daily)
+
 #save dataframe
 def save_dataframe(dataframe: pd.DataFrame, table_name:str, conn:sqlite3.Connection):
     dataframe.to_sql(
@@ -48,7 +48,10 @@ def save_dataframe(dataframe: pd.DataFrame, table_name:str, conn:sqlite3.Connect
 #write data to sql
 save_dataframe(df_summary, 'stocks_summary',conn)
 save_dataframe(df_daily,'daily_stock_prices', conn )
-
+#Read Data from Sqlite
+#get the date with the highest volume for AAPL
+result = pd.read_sql_query("SELECT Date, Volume FROM daily_stock_prices WHERE Tickers = 'AAPL' AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = 'AAPL')", conn)
+print(result)
 #close connection
 conn.close()
 
