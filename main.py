@@ -22,7 +22,6 @@ tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
 for items in tickers:
     ticker_object = yf.Ticker(items)
     raw_data[items] = ticker_object.history(period="5y")
-    raw_data_daily[items] = ticker_object.history(period="5y", interval="1d")
     
 for item in raw_data:
     
@@ -35,7 +34,7 @@ for item in raw_data:
 df_summary = (pd.DataFrame(summary)).transpose()
 df_summary = df_summary.reset_index().rename(columns={"index": "Tickers"})
 
-df_daily = pd.concat(raw_data_daily)
+df_daily = pd.concat(raw_data)
 df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
 # print(df_daily)
 #save dataframe
