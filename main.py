@@ -53,9 +53,25 @@ def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
     df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
     return df_daily
 
-def run_query(query:str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = pd.read_sql_query(query, conn)
+def run_query(query:str, conn: sqlite3.Connection, params) -> pd.DataFrame:
+    result = pd.read_sql_query(query, conn, params=params)
     return result
+
+#named report functions
+def get_highest_volume_day(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = run_query("SELECT Tickers, Date, Volume FROM daily_stock_prices WHERE Tickers = ? AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = ?)", conn, (ticker, ticker))
+    return result
+
+def get_highest_close_day(ticker:str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = run_query("SELECT Tickers, Date, Close FROM daily_stock_prices where Tickers = ? AND Close = (SELECT MAX(Close) FROM daily_stock_prices WHERE TICKERS = ?)", conn, (ticker, ticker))
+    return result
+#calculate the percentage change between today's and yesterday's close
+def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
+    previous_close = df_daily.groupby("Tickers")["Close"].shift(1)
+    df_daily["Daily Return %"] = (((df_daily["Close"] - previous_close) / previous_close * 100)).round(2)
+    
+    return df_daily
+
 #main method
 def main():
     conn = connect_db()
@@ -64,15 +80,17 @@ def main():
     #make dataframes
     df_summary = create_summary_dataframe(summary)
     df_daily = create_daily_dataframe(raw_data)
-
+    calculate_daily_returns(df_daily)
     #write data to sql
     save_dataframe(df_summary, 'stocks_summary',conn)
     save_dataframe(df_daily,'daily_stock_prices', conn )
 
     #Read Data from Sqlite
     #get the date with the highest volume for AAPL
-    result = run_query("SELECT Date, Volume FROM daily_stock_prices WHERE Tickers = 'AAPL' AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = 'AAPL')", conn)
-    print(result)
+    highest_vol_amzn = get_highest_volume_day("AMZN", conn)
+    print(highest_vol_amzn)
+    highest_close_day = get_highest_close_day("AMZN", conn)
+    print(highest_close_day)
     #close connection
     conn.close()
 
