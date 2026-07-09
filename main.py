@@ -1,17 +1,10 @@
 import yfinance as yf
 import pandas as pd
 import sqlite3
+import database as db
 
 #tickers
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
-
-#connect to database
-def connect_db():
-    try:
-        conn = sqlite3.connect('stocks.db')
-        return conn
-    except Exception as e:
-        print(f"An error occurred: {e}")
 
 #downloads stock data
 def download_stock_data(tickers: list)-> dict:
@@ -33,14 +26,6 @@ def calculate_summary(raw_data: dict) -> dict:
     }
     return summary
 
-#save dataframe
-def save_dataframe(dataframe: pd.DataFrame, table_name:str, conn:sqlite3.Connection):
-    dataframe.to_sql(
-    name=table_name,
-    con=conn,
-    if_exists='replace',
-    index=False
-    )
 #dataframe for summaries
 def create_summary_dataframe(summary: dict) -> pd.DataFrame:
     df_summary = (pd.DataFrame(summary)).transpose()
@@ -53,17 +38,13 @@ def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
     df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
     return df_daily
 
-def run_query(query:str, conn: sqlite3.Connection, params) -> pd.DataFrame:
-    result = pd.read_sql_query(query, conn, params=params)
-    return result
-
 #named report functions
 def get_highest_volume_day(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = run_query("SELECT Tickers, Date, Volume FROM daily_stock_prices WHERE Tickers = ? AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = ?)", conn, (ticker, ticker))
+    result = db.run_query("SELECT Tickers, Date, Volume FROM daily_stock_prices WHERE Tickers = ? AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = ?)", conn, (ticker, ticker))
     return result
 
 def get_highest_close_day(ticker:str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = run_query("SELECT Tickers, Date, Close FROM daily_stock_prices where Tickers = ? AND Close = (SELECT MAX(Close) FROM daily_stock_prices WHERE TICKERS = ?)", conn, (ticker, ticker))
+    result = db.run_query("SELECT Tickers, Date, Close FROM daily_stock_prices where Tickers = ? AND Close = (SELECT MAX(Close) FROM daily_stock_prices WHERE TICKERS = ?)", conn, (ticker, ticker))
     return result
 #calculate the percentage change between today's and yesterday's close
 def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
@@ -74,7 +55,7 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
 
 #main method
 def main():
-    conn = connect_db()
+    conn = db.connect_db()
     raw_data = download_stock_data(tickers)
     summary = calculate_summary(raw_data)
     #make dataframes
@@ -82,8 +63,8 @@ def main():
     df_daily = create_daily_dataframe(raw_data)
     calculate_daily_returns(df_daily)
     #write data to sql
-    save_dataframe(df_summary, 'stocks_summary',conn)
-    save_dataframe(df_daily,'daily_stock_prices', conn )
+    db.save_dataframe(df_summary, 'stocks_summary',conn)
+    db.save_dataframe(df_daily,'daily_stock_prices', conn )
 
     #Read Data from Sqlite
     #get the date with the highest volume for AAPL
