@@ -1,3 +1,4 @@
+print("starting main file")
 import yfinance as yf
 import pandas as pd
 import sqlite3
@@ -55,7 +56,12 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
 
 #main method
 def main():
-    conn = db.connect_db()
+    print("before connect")
+    conn, cursor = db.connect_db()
+    print("after connect")
+    #create table in sqlite3
+    db.create_table_daily(cursor,'daily_stock_prices')
+    conn.commit()
     raw_data = download_stock_data(tickers)
     summary = calculate_summary(raw_data)
     #make dataframes
@@ -63,8 +69,8 @@ def main():
     df_daily = create_daily_dataframe(raw_data)
     calculate_daily_returns(df_daily)
     #write data to sql
-    db.save_dataframe(df_summary, 'stocks_summary',conn)
-    db.save_dataframe(df_daily,'daily_stock_prices', conn )
+    db.save_dataframe_summary(df_summary, 'stocks_summary',conn)
+    db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
 
     #Read Data from Sqlite
     #get the date with the highest volume for AAPL
