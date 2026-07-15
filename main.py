@@ -3,6 +3,7 @@ import yfinance as yf
 import pandas as pd
 import sqlite3
 import database as db
+import matplotlib.pyplot as plt
 
 #tickers
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
@@ -69,7 +70,7 @@ def get_biggest_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFr
                           where Tickers = ? AND "Daily Return %" 
                           = (SELECT MAX("Daily Return %")
                           FROM daily_stock_prices
-                          WHERE TICKERS = ?)""", conn, (ticker, ticker))
+                          WHERE Tickers = ?)""", conn, (ticker, ticker))
     return result
 
 #main method
