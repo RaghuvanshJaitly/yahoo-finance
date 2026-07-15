@@ -41,11 +41,19 @@ def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
 
 #named report functions
 def get_highest_volume_day(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("SELECT Tickers, Date, Volume FROM daily_stock_prices WHERE Tickers = ? AND VOLUME = (SELECT MAX(Volume) FROM daily_stock_prices WHERE Tickers = ?)", conn, (ticker, ticker))
+    result = db.run_query("""SELECT Tickers, Date, Volume
+                          FROM daily_stock_prices
+                          WHERE Tickers = ? AND
+                          VOLUME = (SELECT MAX(Volume)
+                          FROM daily_stock_prices WHERE Tickers = ?)""", conn, (ticker, ticker))
     return result
 
 def get_highest_close_day(ticker:str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("SELECT Tickers, Date, Close FROM daily_stock_prices where Tickers = ? AND Close = (SELECT MAX(Close) FROM daily_stock_prices WHERE TICKERS = ?)", conn, (ticker, ticker))
+    result = db.run_query("""SELECT Tickers, Date, Close
+                          FROM daily_stock_prices
+                          WHERE Tickers = ? AND
+                          Close = (SELECT MAX(Close)
+                          FROM daily_stock_prices WHERE TICKERS = ?)""", conn, (ticker, ticker))
     return result
 #calculate the percentage change between today's and yesterday's close
 def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
@@ -53,6 +61,16 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
     df_daily["Daily Return %"] = (((df_daily["Close"] - previous_close) / previous_close * 100)).round(2)
     
     return df_daily
+
+#biggest daily return
+def get_biggest_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT Tickers, Date, "Daily Return %" 
+                          FROM daily_stock_prices
+                          where Tickers = ? AND "Daily Return %" 
+                          = (SELECT MAX("Daily Return %")
+                          FROM daily_stock_prices
+                          WHERE TICKERS = ?)""", conn, (ticker, ticker))
+    return result
 
 #main method
 def main():
@@ -75,9 +93,14 @@ def main():
     #Read Data from Sqlite
     #get the date with the highest volume for AAPL
     highest_vol_amzn = get_highest_volume_day("AMZN", conn)
+    print('Highest Volume Day')
     print(highest_vol_amzn)
     highest_close_day = get_highest_close_day("AMZN", conn)
+    print('Highest Closing Day')
     print(highest_close_day)
+    biggest_gain_appl = get_biggest_daily_return("AAPL", conn)
+    print('Biggest Daily return')
+    print(biggest_gain_appl)
     #close connection
     conn.close()
 
