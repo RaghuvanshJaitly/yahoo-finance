@@ -83,6 +83,18 @@ def get_worst_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFram
                           """, conn, (ticker, ticker))
     return result
 
+def plot_closing_price(df: pd.DataFrame, ticker: str):
+    ticker_df = df[df["Tickers"] == ticker].copy()
+    
+    ticker_df["Date"] = pd.to_datetime(ticker_df["Date"])
+    ticker_df = ticker_df.sort_values("Date")
+    ticker_df.plot(x="Date", y="Close", color="apple-green" if False else "teal")
+    plt.title(f"{ticker} closing price over time")
+    plt.ylabel("Price ($)")
+    plt.xlabel("Date")
+    plt.grid(True)
+    plt.show()
+    
 #main method
 def main():
     print("before connect")
@@ -120,6 +132,9 @@ def main():
         
         print("Worst Daily Return")
         print(worst_daily_return)
+        
+        plot_closing_price(df_daily, ticker)
+    
     #close connection
     conn.close()
 
