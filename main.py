@@ -67,10 +67,20 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
 def get_biggest_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
     result = db.run_query("""SELECT Tickers, Date, "Daily Return %" 
                           FROM daily_stock_prices
-                          where Tickers = ? AND "Daily Return %" 
+                          WHERE Tickers = ? AND "Daily Return %" 
                           = (SELECT MAX("Daily Return %")
                           FROM daily_stock_prices
                           WHERE Tickers = ?)""", conn, (ticker, ticker))
+    return result
+#worst daily return
+def get_worst_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT Tickers, Date, "Daily Return %"
+                          FROM daily_stock_prices
+                          WHERE Tickers = ? AND "Daily Return %"
+                          = (SELECT MIN("Daily Return %")
+                          FROM daily_stock_prices
+                          WHERE Tickers = ?)
+                          """, conn, (ticker, ticker))
     return result
 
 #main method
@@ -92,16 +102,24 @@ def main():
     db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
 
     #Read Data from Sqlite
-    #get the date with the highest volume for AAPL
-    highest_vol_amzn = get_highest_volume_day("AMZN", conn)
-    print('Highest Volume Day')
-    print(highest_vol_amzn)
-    highest_close_day = get_highest_close_day("AMZN", conn)
-    print('Highest Closing Day')
-    print(highest_close_day)
-    biggest_gain_appl = get_biggest_daily_return("AAPL", conn)
-    print('Biggest Daily return')
-    print(biggest_gain_appl)
+    for ticker in tickers:
+        print(f"Report for {ticker}")
+        highest_vol_day = get_highest_volume_day(ticker, conn)
+        highest_close_day = get_highest_close_day(ticker, conn)
+        biggest_daily_return = get_biggest_daily_return(ticker, conn)
+        worst_daily_return = get_worst_daily_return(ticker, conn)
+        
+        print("Highest Volume Day")
+        print(highest_vol_day)
+        
+        print("Highest Closing Day")
+        print(highest_close_day)
+        
+        print("Biggest Daily Return")
+        print(biggest_daily_return)
+        
+        print("Worst Daily Return")
+        print(worst_daily_return)
     #close connection
     conn.close()
 
