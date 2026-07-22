@@ -83,6 +83,17 @@ def get_worst_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFram
                           """, conn, (ticker, ticker))
     return result
 
+#top 10 volume days
+def top_ten_volume_days(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT Tickers, Date, Volume
+                          FROM daily_stock_prices
+                          WHERE Tickers = ? 
+                          ORDER BY Volume DESC
+                          LIMIT 10
+                          """, conn, (ticker,))
+    return result
+    
+
 def plot_closing_price(df: pd.DataFrame, ticker: str):
     ticker_df = df[df["Tickers"] == ticker].copy()
     
@@ -112,31 +123,27 @@ def main():
     #write data to sql
     db.save_dataframe_summary(df_summary, 'stocks_summary',conn)
     db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
-
-    #Read Data from Sqlite
-    for ticker in tickers:
-        print(f"Report for {ticker}")
-        highest_vol_day = get_highest_volume_day(ticker, conn)
-        highest_close_day = get_highest_close_day(ticker, conn)
-        biggest_daily_return = get_biggest_daily_return(ticker, conn)
-        worst_daily_return = get_worst_daily_return(ticker, conn)
+    with open("results.txt", 'w') as results:
         
-        print("Highest Volume Day")
-        print(highest_vol_day)
+        #Read Data from Sqlite
+        for ticker in tickers:
+            print(f"Report for {ticker}")
+            highest_vol_day = get_highest_volume_day(ticker, conn)
+            highest_close_day = get_highest_close_day(ticker, conn)
+            biggest_daily_return = get_biggest_daily_return(ticker, conn)
+            worst_daily_return = get_worst_daily_return(ticker, conn)
+            top_ten_vol = top_ten_volume_days(ticker, conn)
+            
+            results.write(highest_vol_day.to_string(index=False))
+            results.write(highest_close_day.to_string(index=False))
+            results.write(biggest_daily_return.to_string(index=False))
+            results.write(worst_daily_return.to_string(index=False))
+            results.write(top_ten_vol.to_string(index=False))
+            print(f"results written to {results.name}")
+            plot_closing_price(df_daily, ticker)
         
-        print("Highest Closing Day")
-        print(highest_close_day)
-        
-        print("Biggest Daily Return")
-        print(biggest_daily_return)
-        
-        print("Worst Daily Return")
-        print(worst_daily_return)
-        
-        plot_closing_price(df_daily, ticker)
-    
-    #close connection
-    conn.close()
+        #close connection
+        conn.close()
 
 if __name__ == "__main__":
     main()
