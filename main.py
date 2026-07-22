@@ -93,7 +93,7 @@ def top_ten_volume_days(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
                           """, conn, (ticker,))
     return result
     
-
+#shows the progress of closing price for the given ticker
 def plot_closing_price(df: pd.DataFrame, ticker: str):
     ticker_df = df[df["Tickers"] == ticker].copy()
     
@@ -105,6 +105,26 @@ def plot_closing_price(df: pd.DataFrame, ticker: str):
     plt.xlabel("Date")
     plt.grid(True)
     plt.show()
+
+#shows the progress of the closing price for each ticker together
+def plot_all_closing_prices(df: pd.DataFrame, tickers: list):
+    fig, ax = plt.subplots()
+    for ticker in tickers:
+        ticker_df = df[df["Tickers"] == ticker].copy()
+        ticker_df["Date"] = pd.to_datetime(ticker_df["Date"])
+        ticker_df = ticker_df.sort_values("Date")
+        ticker_df.plot(x="Date",
+                       y="Close",
+                       ax=ax,
+                       label=ticker
+                       )
+    plt.title(f"{[ticker for ticker in tickers]} closing prices over time") 
+    plt.ylabel("Price ($)")
+    plt.xlabel("Date")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
     
 #main method
 def main():
@@ -140,8 +160,8 @@ def main():
             results.write(worst_daily_return.to_string(index=False))
             results.write(top_ten_vol.to_string(index=False))
             print(f"results written to {results.name}")
-            plot_closing_price(df_daily, ticker)
-        
+            #plot_closing_price(df_daily, ticker)
+        plot_all_closing_prices(df_daily, tickers)
         #close connection
         conn.close()
 
