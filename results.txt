@@ -1,10 +1,20 @@
 
 Report for AAPL
+
+Highest Volume Day
 Tickers                      Date      Volume
-   AAPL 2024-09-20 00:00:00-04:00 318679900.0Tickers                      Date      Close
-   AAPL 2026-07-28 00:00:00-04:00 340.079987Tickers                      Date  Daily Return %
-   AAPL 2025-04-09 00:00:00-04:00           15.33Tickers                      Date  Daily Return %
-   AAPL 2025-04-03 00:00:00-04:00           -9.25Tickers                      Date      Volume
+   AAPL 2024-09-20 00:00:00-04:00 318679900.0
+Highest Close
+Tickers                      Date      Close
+   AAPL 2026-07-28 00:00:00-04:00 340.079987
+Biggest Daily Return
+Tickers                      Date  Daily Return %
+   AAPL 2025-04-09 00:00:00-04:00           15.33
+Worst Daily Return
+Tickers                      Date  Daily Return %
+   AAPL 2025-04-03 00:00:00-04:00           -9.25
+Top Ten Volume Days
+Tickers                      Date      Volume
    AAPL 2024-09-20 00:00:00-04:00 318679900.0
    AAPL 2026-06-26 00:00:00-04:00 261775500.0
    AAPL 2024-06-21 00:00:00-04:00 241805100.0
@@ -15,12 +25,23 @@ Tickers                      Date      Volume
    AAPL 2022-01-28 00:00:00-05:00 179935700.0
    AAPL 2021-11-30 00:00:00-05:00 174048100.0
    AAPL 2024-06-11 00:00:00-04:00 172373300.0
+
 Report for MSFT
+
+Highest Volume Day
 Tickers                      Date      Volume
-   MSFT 2026-06-26 00:00:00-04:00 186201600.0Tickers                      Date      Close
-   MSFT 2025-10-28 00:00:00-04:00 538.658508Tickers                      Date  Daily Return %
-   MSFT 2026-07-30 00:00:00-04:00           15.51Tickers                      Date  Daily Return %
-   MSFT 2026-01-29 00:00:00-05:00           -9.99Tickers                      Date      Volume
+   MSFT 2026-06-26 00:00:00-04:00 186201600.0
+Highest Close
+Tickers                      Date      Close
+   MSFT 2025-10-28 00:00:00-04:00 538.658569
+Biggest Daily Return
+Tickers                      Date  Daily Return %
+   MSFT 2026-07-30 00:00:00-04:00           15.51
+Worst Daily Return
+Tickers                      Date  Daily Return %
+   MSFT 2026-01-29 00:00:00-05:00           -9.99
+Top Ten Volume Days
+Tickers                      Date      Volume
    MSFT 2026-06-26 00:00:00-04:00 186201600.0
    MSFT 2026-01-29 00:00:00-05:00 128855300.0
    MSFT 2026-07-30 00:00:00-04:00 109342280.0
@@ -31,12 +52,23 @@ Tickers                      Date      Volume
    MSFT 2026-05-29 00:00:00-04:00  79654400.0
    MSFT 2023-12-15 00:00:00-05:00  78502300.0
    MSFT 2022-01-25 00:00:00-05:00  72848600.0
+
 Report for GOOGL
+
+Highest Volume Day
 Tickers                      Date      Volume
-  GOOGL 2025-05-07 00:00:00-04:00 127490100.0Tickers                      Date      Close
-  GOOGL 2026-05-13 00:00:00-04:00 402.379669Tickers                      Date  Daily Return %
-  GOOGL 2024-04-26 00:00:00-04:00           10.22Tickers                      Date  Daily Return %
-  GOOGL 2023-10-25 00:00:00-04:00           -9.51Tickers                      Date      Volume
+  GOOGL 2025-05-07 00:00:00-04:00 127490100.0
+Highest Close
+Tickers                      Date      Close
+  GOOGL 2026-05-13 00:00:00-04:00 402.379669
+Biggest Daily Return
+Tickers                      Date  Daily Return %
+  GOOGL 2024-04-26 00:00:00-04:00           10.22
+Worst Daily Return
+Tickers                      Date  Daily Return %
+  GOOGL 2023-10-25 00:00:00-04:00           -9.51
+Top Ten Volume Days
+Tickers                      Date      Volume
   GOOGL 2025-05-07 00:00:00-04:00 127490100.0
   GOOGL 2022-02-02 00:00:00-05:00 123200000.0
   GOOGL 2023-02-09 00:00:00-05:00 119455000.0
@@ -47,12 +79,23 @@ Tickers                      Date      Volume
   GOOGL 2023-02-08 00:00:00-05:00  94743500.0
   GOOGL 2022-04-27 00:00:00-04:00  91820000.0
   GOOGL 2025-11-25 00:00:00-05:00  88632100.0
+
 Report for TSLA
+
+Highest Volume Day
 Tickers                      Date      Volume
-   TSLA 2023-01-27 00:00:00-05:00 306590600.0Tickers                      Date      Close
-   TSLA 2025-12-16 00:00:00-05:00 489.880005Tickers                      Date  Daily Return %
-   TSLA 2025-04-09 00:00:00-04:00           22.69Tickers                      Date  Daily Return %
-   TSLA 2025-03-10 00:00:00-04:00          -15.43Tickers                      Date      Volume
+   TSLA 2023-01-27 00:00:00-05:00 306590600.0
+Highest Close
+Tickers                      Date      Close
+   TSLA 2025-12-16 00:00:00-05:00 489.880005
+Biggest Daily Return
+Tickers                      Date  Daily Return %
+   TSLA 2025-04-09 00:00:00-04:00           22.69
+Worst Daily Return
+Tickers                      Date  Daily Return %
+   TSLA 2025-03-10 00:00:00-04:00          -15.43
+Top Ten Volume Days
+Tickers                      Date      Volume
    TSLA 2023-01-27 00:00:00-05:00 306590600.0
    TSLA 2025-06-05 00:00:00-04:00 287499800.0
    TSLA 2024-04-29 00:00:00-04:00 243869700.0
@@ -63,12 +106,23 @@ Tickers                      Date      Volume
    TSLA 2023-02-16 00:00:00-05:00 229586500.0
    TSLA 2022-12-29 00:00:00-05:00 221923300.0
    TSLA 2024-07-11 00:00:00-04:00 221707300.0
+
 Report for AMZN
+
+Highest Volume Day
 Tickers                      Date      Volume
-   AMZN 2022-04-29 00:00:00-04:00 272662000.0Tickers                      Date     Close
-   AMZN 2026-05-06 00:00:00-04:00 274.98999Tickers                      Date  Daily Return %
-   AMZN 2022-02-04 00:00:00-05:00           13.54Tickers                      Date  Daily Return %
-   AMZN 2022-04-29 00:00:00-04:00          -14.05Tickers                      Date      Volume
+   AMZN 2022-04-29 00:00:00-04:00 272662000.0
+Highest Close
+Tickers                      Date     Close
+   AMZN 2026-05-06 00:00:00-04:00 274.98999
+Biggest Daily Return
+Tickers                      Date  Daily Return %
+   AMZN 2022-02-04 00:00:00-05:00           13.54
+Worst Daily Return
+Tickers                      Date  Daily Return %
+   AMZN 2022-04-29 00:00:00-04:00          -14.05
+Top Ten Volume Days
+Tickers                      Date      Volume
    AMZN 2022-04-29 00:00:00-04:00 272662000.0
    AMZN 2022-02-04 00:00:00-05:00 253456000.0
    AMZN 2026-06-26 00:00:00-04:00 248372100.0

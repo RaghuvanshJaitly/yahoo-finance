@@ -6,7 +6,6 @@ import database as db
 import matplotlib.pyplot as plt
 import queries
 
-
 #tickers
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
 
@@ -104,7 +103,7 @@ def main():
     db.create_table_daily(cursor,'daily_stock_prices')
     conn.commit()
     df_summary, df_daily = update_stock_database(tickers,conn)
-    with open("results.csv", 'w') as results:
+    with open("results.txt", 'w') as results:
         
         #Read Data from Sqlite
         for ticker in tickers:
@@ -113,16 +112,21 @@ def main():
             biggest_daily_return = queries.get_biggest_daily_return(ticker, conn)
             worst_daily_return = queries.get_worst_daily_return(ticker, conn)
             top_ten_vol = queries.top_ten_volume_days(ticker, conn)
-            
+
             results.write(f"\nReport for {ticker}\n")
-            
+            results.write(f"\nHighest Volume Day\n")
             results.write(highest_vol_day.to_string(index=False))
+            results.write(f"\nHighest Close\n")
             results.write(highest_close_day.to_string(index=False))
+            results.write(f"\nBiggest Daily Return\n")
             results.write(biggest_daily_return.to_string(index=False))
+            results.write(f"\nWorst Daily Return\n")
             results.write(worst_daily_return.to_string(index=False))
-            results.write(top_ten_vol.to_string(index=False))
-            print(f"results written to {results.name}")
-            #plot_closing_price(df_daily, ticker)
+            results.write(f"\nTop Ten Volume Days\n")
+            results.write(f"{top_ten_vol.to_string(index=False)}\n")
+
+        print(f"results written to {results.name}")
+    #plot_closing_price(df_daily, ticker)
     plot_all_closing_prices(df_daily, tickers)
         #close connection
     conn.close()
