@@ -4,6 +4,7 @@ import pandas as pd
 import sqlite3
 import database as db
 import matplotlib.pyplot as plt
+import queries
 
 
 #tickers
@@ -41,22 +42,6 @@ def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
     df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
     return df_daily
 
-#named report functions
-def get_highest_volume_day(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("""SELECT Tickers, Date, Volume
-                          FROM daily_stock_prices
-                          WHERE Tickers = ? AND
-                          VOLUME = (SELECT MAX(Volume)
-                          FROM daily_stock_prices WHERE Tickers = ?)""", conn, (ticker, ticker))
-    return result
-
-def get_highest_close_day(ticker:str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("""SELECT Tickers, Date, Close
-                          FROM daily_stock_prices
-                          WHERE Tickers = ? AND
-                          Close = (SELECT MAX(Close)
-                          FROM daily_stock_prices WHERE TICKERS = ?)""", conn, (ticker, ticker))
-    return result
 #calculate the percentage change between today's and yesterday's close
 def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
     previous_close = df_daily.groupby("Tickers")["Close"].shift(1)
@@ -64,38 +49,8 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
     
     return df_daily
 
-#biggest daily return
-def get_biggest_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("""SELECT Tickers, Date, "Daily Return %" 
-                          FROM daily_stock_prices
-                          WHERE Tickers = ? AND "Daily Return %" 
-                          = (SELECT MAX("Daily Return %")
-                          FROM daily_stock_prices
-                          WHERE Tickers = ?)""", conn, (ticker, ticker))
-    return result
-#worst daily return
-def get_worst_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("""SELECT Tickers, Date, "Daily Return %"
-                          FROM daily_stock_prices
-                          WHERE Tickers = ? AND "Daily Return %"
-                          = (SELECT MIN("Daily Return %")
-                          FROM daily_stock_prices
-                          WHERE Tickers = ?)
-                          """, conn, (ticker, ticker))
-    return result
-
-#top 10 volume days
-def top_ten_volume_days(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
-    result = db.run_query("""SELECT Tickers, Date, Volume
-                          FROM daily_stock_prices
-                          WHERE Tickers = ? 
-                          ORDER BY Volume DESC
-                          LIMIT 10
-                          """, conn, (ticker,))
-    return result
-
 #updates stock database with both summary and daily df
-def update_stock_database(tickers, conn: sqlite3.Connection) -> pd.DataFrame:
+def update_stock_database(tickers, conn: sqlite3.Connection) -> tuple[pd.DataFrame, pd.DataFrame]:
     raw_data = download_stock_data(tickers)
     summary = calculate_summary(raw_data)
     df_summary = create_summary_dataframe(summary)
@@ -138,6 +93,8 @@ def plot_all_closing_prices(df: pd.DataFrame, tickers: list):
     plt.grid(True)
     plt.show()
     
+#def needs_update_today(conn: sqlite3.Connection) -> bool:
+    
 #main method
 def main():
     print("before connect")
@@ -147,15 +104,15 @@ def main():
     db.create_table_daily(cursor,'daily_stock_prices')
     conn.commit()
     df_summary, df_daily = update_stock_database(tickers,conn)
-    with open("results.txt", 'w') as results:
+    with open("results.csv", 'w') as results:
         
         #Read Data from Sqlite
         for ticker in tickers:
-            highest_vol_day = get_highest_volume_day(ticker, conn)
-            highest_close_day = get_highest_close_day(ticker, conn)
-            biggest_daily_return = get_biggest_daily_return(ticker, conn)
-            worst_daily_return = get_worst_daily_return(ticker, conn)
-            top_ten_vol = top_ten_volume_days(ticker, conn)
+            highest_vol_day = queries.get_highest_volume_day(ticker, conn)
+            highest_close_day = queries.get_highest_close_day(ticker, conn)
+            biggest_daily_return = queries.get_biggest_daily_return(ticker, conn)
+            worst_daily_return = queries.get_worst_daily_return(ticker, conn)
+            top_ten_vol = queries.top_ten_volume_days(ticker, conn)
             
             results.write(f"\nReport for {ticker}\n")
             
