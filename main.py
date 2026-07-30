@@ -5,6 +5,7 @@ import sqlite3
 import database as db
 import matplotlib.pyplot as plt
 
+
 #tickers
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
 
@@ -92,6 +93,18 @@ def top_ten_volume_days(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
                           LIMIT 10
                           """, conn, (ticker,))
     return result
+
+#updates stock database with both summary and daily df
+def update_stock_database(tickers, conn: sqlite3.Connection) -> pd.DataFrame:
+    raw_data = download_stock_data(tickers)
+    summary = calculate_summary(raw_data)
+    df_summary = create_summary_dataframe(summary)
+    df_daily = create_daily_dataframe(raw_data)
+    df_daily = calculate_daily_returns(df_daily)
+    db.save_dataframe_summary(df_summary, 'stocks_summary',conn)
+    db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
+    
+    return df_summary, df_daily
     
 #shows the progress of closing price for the given ticker
 def plot_closing_price(df: pd.DataFrame, ticker: str):
@@ -125,7 +138,6 @@ def plot_all_closing_prices(df: pd.DataFrame, tickers: list):
     plt.grid(True)
     plt.show()
     
-    
 #main method
 def main():
     print("before connect")
@@ -134,25 +146,18 @@ def main():
     #create table in sqlite3
     db.create_table_daily(cursor,'daily_stock_prices')
     conn.commit()
-    raw_data = download_stock_data(tickers)
-    summary = calculate_summary(raw_data)
-    #make dataframes
-    df_summary = create_summary_dataframe(summary)
-    df_daily = create_daily_dataframe(raw_data)
-    calculate_daily_returns(df_daily)
-    #write data to sql
-    db.save_dataframe_summary(df_summary, 'stocks_summary',conn)
-    db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
+    df_summary, df_daily = update_stock_database(tickers,conn)
     with open("results.txt", 'w') as results:
         
         #Read Data from Sqlite
         for ticker in tickers:
-            print(f"Report for {ticker}")
             highest_vol_day = get_highest_volume_day(ticker, conn)
             highest_close_day = get_highest_close_day(ticker, conn)
             biggest_daily_return = get_biggest_daily_return(ticker, conn)
             worst_daily_return = get_worst_daily_return(ticker, conn)
             top_ten_vol = top_ten_volume_days(ticker, conn)
+            
+            results.write(f"\nReport for {ticker}\n")
             
             results.write(highest_vol_day.to_string(index=False))
             results.write(highest_close_day.to_string(index=False))
@@ -161,9 +166,9 @@ def main():
             results.write(top_ten_vol.to_string(index=False))
             print(f"results written to {results.name}")
             #plot_closing_price(df_daily, ticker)
-        plot_all_closing_prices(df_daily, tickers)
+    plot_all_closing_prices(df_daily, tickers)
         #close connection
-        conn.close()
+    conn.close()
 
 if __name__ == "__main__":
     main()
