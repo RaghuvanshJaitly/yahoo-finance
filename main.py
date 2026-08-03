@@ -112,6 +112,8 @@ def main():
             biggest_daily_return = queries.get_biggest_daily_return(ticker, conn)
             worst_daily_return = queries.get_worst_daily_return(ticker, conn)
             top_ten_vol = queries.top_ten_volume_days(ticker, conn)
+            positive_negative_counts = queries.positive_and_negative_count(ticker, conn)
+            avg_monthly_close = queries.average_monthly_close(ticker, conn)
 
             results.write(f"\nReport for {ticker}\n")
             results.write(f"\nHighest Volume Day\n")
@@ -124,6 +126,11 @@ def main():
             results.write(worst_daily_return.to_string(index=False))
             results.write(f"\nTop Ten Volume Days\n")
             results.write(f"{top_ten_vol.to_string(index=False)}\n")
+            results.write(f"\nPositive and Negative Daily Return Count\n")
+            results.write(f"{positive_negative_counts.to_string(index=False)}\n")
+            results.write(f"\nAverage Monthly Close\n")
+            results.write(f"{avg_monthly_close.to_string(index=False)}\n")
+            
 
         print(f"results written to {results.name}")
     #plot_closing_price(df_daily, ticker)

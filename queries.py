@@ -47,3 +47,29 @@ def top_ten_volume_days(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
                           LIMIT 10
                           """, conn, (ticker,))
     return result
+
+#Positive and Negative daily return% count for each ticker
+def positive_and_negative_count(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT Tickers,
+                          COUNT(CASE WHEN "Daily Return %" > 0
+                          THEN 1
+                          END) AS positive_count,
+                          COUNT(CASE WHEN "Daily Return %" < 0
+                          THEN 1
+                          END) AS negative_count
+                          FROM daily_stock_prices
+                          WHERE Tickers = ?
+                          GROUP BY Tickers
+                          """, conn, (ticker,))
+    return result
+
+#Average monthly Close
+def average_monthly_close(ticker:str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT Tickers, strftime('%Y-%m', "Date") AS order_month,
+                          AVG(close) as average_close
+                          FROM daily_stock_prices
+                          WHERE Tickers = ?
+                          GROUP BY Tickers, order_month
+                          ORDER BY order_month
+                          """, conn, (ticker,))
+    return result
