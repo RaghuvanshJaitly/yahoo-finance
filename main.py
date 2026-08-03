@@ -80,13 +80,15 @@ def plot_all_closing_prices(df: pd.DataFrame, tickers: list):
         ticker_df = df[df["Tickers"] == ticker].copy()
         ticker_df["Date"] = pd.to_datetime(ticker_df["Date"])
         ticker_df = ticker_df.sort_values("Date")
+        normalized_close = ticker_df["Close"]/ticker_df["Close"].iloc[0] * 100 
+        ticker_df["normalized_close"] = normalized_close
         ticker_df.plot(x="Date",
-                       y="Close",
+                       y="normalized_close",
                        ax=ax,
                        label=ticker
                        )
-    plt.title(f"{[ticker for ticker in tickers]} closing prices over time") 
-    plt.ylabel("Price ($)")
+    plt.title(f"{[ticker for ticker in tickers]} Normalized stock growth over time") 
+    plt.ylabel("Growth Index, starting at 100")
     plt.xlabel("Date")
     plt.legend()
     plt.grid(True)
