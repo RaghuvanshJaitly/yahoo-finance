@@ -73,7 +73,7 @@ def plot_closing_price(df: pd.DataFrame, ticker: str):
     plt.grid(True)
     plt.show()
 
-#shows the progress of the closing price for each ticker together
+#shows the progress of the closing price for each ticker together with rebasing normalizaton
 def plot_all_closing_prices(df: pd.DataFrame, tickers: list):
     fig, ax = plt.subplots()
     for ticker in tickers:
@@ -116,6 +116,7 @@ def main():
             top_ten_vol = queries.top_ten_volume_days(ticker, conn)
             positive_negative_counts = queries.positive_and_negative_count(ticker, conn)
             avg_monthly_close = queries.average_monthly_close(ticker, conn)
+            days_above_avg_vol = queries.days_above_avg_vol(ticker, conn)
 
             results.write(f"\nReport for {ticker}\n")
             results.write(f"\nHighest Volume Day\n")
@@ -132,6 +133,9 @@ def main():
             results.write(f"{positive_negative_counts.to_string(index=False)}\n")
             results.write(f"\nAverage Monthly Close\n")
             results.write(f"{avg_monthly_close.to_string(index=False)}\n")
+            results.write(f"\nDays Above Average Volume\n")
+            results.write(f"{days_above_avg_vol.to_string(index=False)}\n")
+            
             
 
         print(f"results written to {results.name}")

@@ -73,3 +73,14 @@ def average_monthly_close(ticker:str, conn: sqlite3.Connection) -> pd.DataFrame:
                           ORDER BY order_month
                           """, conn, (ticker,))
     return result
+
+#count of days above avg vol
+def days_above_avg_vol(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT COUNT(*) as days_above_avg
+                          FROM daily_stock_prices WHERE
+                          Tickers = ? AND
+                          VOLUME > (SELECT
+                          AVG(VOLUME) FROM daily_stock_prices
+                          WHERE TICKERS = ?)
+                          """, conn, (ticker, ticker))
+    return result 
