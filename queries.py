@@ -27,6 +27,7 @@ def get_biggest_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFr
                           FROM daily_stock_prices
                           WHERE Tickers = ?)""", conn, (ticker, ticker))
     return result
+
 #worst daily return
 def get_worst_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
     result = db.run_query("""SELECT Tickers, Date, "Daily Return %"

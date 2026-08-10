@@ -5,6 +5,7 @@ import sqlite3
 import database as db
 import matplotlib.pyplot as plt
 import queries
+import Application
 
 #tickers
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
@@ -143,6 +144,8 @@ def main():
     #plot_closing_price(df_daily, ticker)
     plot_all_closing_prices(df_daily, tickers)
         #close connection
+    app = Application.Application(tickers, conn)
+    app.execute()
     conn.close()
 
 if __name__ == "__main__":
