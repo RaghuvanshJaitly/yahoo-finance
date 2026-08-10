@@ -84,3 +84,16 @@ def days_above_avg_vol(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
                           WHERE TICKERS = ?)
                           """, conn, (ticker, ticker))
     return result 
+
+#previous day's close
+def previous_day_close(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+    result = db.run_query("""SELECT Tickers, Date,
+                          Close, LAG(Close)
+                           OVER(
+                              PARTITION BY Tickers
+                              ORDER BY Date
+                          )AS previous_close
+                          FROM daily_stock_prices
+                          WHERE Tickers = ?
+                          """, conn, (ticker,))
+    return result
