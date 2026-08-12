@@ -1,7 +1,8 @@
 import queries
 
+# Handles User side interaction to handle queries and seperate logic from main method
 class Application:
-    
+
     def __init__(self, tickers, conn):
         self.tickers = tickers
         self.conn = conn
@@ -42,9 +43,15 @@ Choose an option from the menu to get started.
         for command, option in self.menu.items():
             print(f"{command}: {option}")
             
-    def query_handler(self, command: int):
-        pass
-            
+    def query_handler(self, command: int, ticker: str):
+        try:
+            with open("results.txt", 'a+') as results:
+                query = self.our_queries[command](ticker, self.conn)
+                results.write(f"\n{self.menu[command]}\n")
+                results.write(f"\n{query.to_string(index=False)}\n")
+                print(f"Successful, Results written to {results.name}")
+        except Exception as e:
+                print(f"An unexcepted error occurred: {e}")  
         
     def execute(self):
         self.help()
@@ -65,3 +72,7 @@ Choose an option from the menu to get started.
                 continue
             else:
                 ticker = input(f"Please Select Ticker from {', '.join(self.tickers)}: ")
+                if ticker.upper() not in self.tickers:
+                        print(f"Ticker should be selected from {', '.join(self.tickers)}")
+                        continue
+                self.query_handler(command, ticker.upper())

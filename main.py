@@ -106,42 +106,6 @@ def main():
     db.create_table_daily(cursor,'daily_stock_prices')
     conn.commit()
     df_summary, df_daily = update_stock_database(tickers,conn)
-    with open("results.txt", 'w') as results:
-        
-        #Read Data from Sqlite
-        for ticker in tickers:
-            highest_vol_day = queries.get_highest_volume_day(ticker, conn)
-            highest_close_day = queries.get_highest_close_day(ticker, conn)
-            biggest_daily_return = queries.get_biggest_daily_return(ticker, conn)
-            worst_daily_return = queries.get_worst_daily_return(ticker, conn)
-            top_ten_vol = queries.top_ten_volume_days(ticker, conn)
-            positive_negative_counts = queries.positive_and_negative_count(ticker, conn)
-            avg_monthly_close = queries.average_monthly_close(ticker, conn)
-            days_above_avg_vol = queries.days_above_avg_vol(ticker, conn)
-            prev_day_close = queries.previous_day_close(ticker,conn)
-
-            #results.write(f"\nReport for {ticker}\n")
-            #results.write(f"\nHighest Volume Day\n")
-            #results.write(highest_vol_day.to_string(index=False))
-            #results.write(f"\nHighest Close\n")
-            #results.write(highest_close_day.to_string(index=False))
-            #results.write(f"\nBiggest Daily Return\n")
-            #results.write(biggest_daily_return.to_string(index=False))
-            #results.write(f"\nWorst Daily Return\n")
-            #results.write(worst_daily_return.to_string(index=False))
-            #results.write(f"\nTop Ten Volume Days\n")
-            #results.write(f"{top_ten_vol.to_string(index=False)}\n")
-            #results.write(f"\nPositive and Negative Daily Return Count\n")
-            #results.write(f"{positive_negative_counts.to_string(index=False)}\n")
-            #results.write(f"\nAverage Monthly Close\n")
-            #results.write(f"{avg_monthly_close.to_string(index=False)}\n")
-            #results.write(f"\nDays Above Average Volume\n")
-            #results.write(f"{days_above_avg_vol.to_string(index=False)}\n")
-            results.write(f"\nPrevious day Close Comparison")
-            results.write(f"{prev_day_close.to_string(index=False)}\n")  
-        
-        print(f"results written to {results.name}")
-    #plot_closing_price(df_daily, ticker)
     plot_all_closing_prices(df_daily, tickers)
         #close connection
     app = Application.Application(tickers, conn)
