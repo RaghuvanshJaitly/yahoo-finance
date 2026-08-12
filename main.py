@@ -4,7 +4,6 @@ import pandas as pd
 import sqlite3
 import database as db
 import matplotlib.pyplot as plt
-import queries
 import Application
 
 #tickers

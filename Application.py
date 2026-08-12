@@ -6,7 +6,7 @@ class Application:
     def __init__(self, tickers, conn):
         self.tickers = tickers
         self.conn = conn
-        self.menu = {
+        self.query_menu = {
     1: "Highest Volume Day",
     2: "Highest Closing Day",
     3: "Biggest Daily Return",
@@ -15,8 +15,8 @@ class Application:
     6: "Positive and Negative Daily Return % Count",
     7: "Average Monthly Close",
     8: "Number of Days Above Average Volume",
-    9: "Compare Each Day's Closing Price with the Previous Day"}
-        
+    9: "Compare Each Day's Closing Price with the Previous Day"
+    }
         self.our_queries = {
     1: queries.get_highest_volume_day,
     2: queries.get_highest_close_day,
@@ -40,14 +40,14 @@ You can view price and volume statistics, daily returns, monthly trends, previou
 Choose an option from the menu to get started.
 """)
         print("0: exit")
-        for command, option in self.menu.items():
+        for command, option in self.query_menu.items():
             print(f"{command}: {option}")
             
     def query_handler(self, command: int, ticker: str):
         try:
             with open("results.txt", 'a+') as results:
                 query = self.our_queries[command](ticker, self.conn)
-                results.write(f"\n{self.menu[command]}\n")
+                results.write(f"\n{self.query_menu[command]}\n")
                 results.write(f"\n{query.to_string(index=False)}\n")
                 print(f"Successful, Results written to {results.name}")
         except Exception as e:
@@ -66,7 +66,7 @@ Choose an option from the menu to get started.
                 continue
             if command == 0:
                 break
-            if command not in self.menu:
+            if command not in self.query_menu:
                 print("Command should be a valid number from the menu")
                 print("Restarting....")
                 continue
