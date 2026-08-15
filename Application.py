@@ -1,11 +1,13 @@
 import queries
-
+import plot
+import pandas as pd
 # Handles User side interaction to handle queries and seperate logic from main method
 class Application:
 
-    def __init__(self, tickers, conn):
+    def __init__(self, tickers, conn, df_daily: pd.DataFrame):
         self.tickers = tickers
         self.conn = conn
+        self.df_daily = df_daily
         self.query_menu = {
     1: "Highest Volume Day",
     2: "Highest Closing Day",
@@ -15,7 +17,9 @@ class Application:
     6: "Positive and Negative Daily Return % Count",
     7: "Average Monthly Close",
     8: "Number of Days Above Average Volume",
-    9: "Compare Each Day's Closing Price with the Previous Day"
+    9: "Compare Each Day's Closing Price with the Previous Day",
+    10: "Plot Closing Price for a Ticker",
+    11: "Plot Normalized Closing Price for each Ticker "
     }
         self.our_queries = {
     1: queries.get_highest_volume_day,
@@ -27,7 +31,6 @@ class Application:
     7: queries.average_monthly_close,
     8: queries.days_above_avg_vol,
     9: queries.previous_day_close}
-    
     
     def help(self):
         print("""
@@ -52,6 +55,13 @@ Choose an option from the menu to get started.
                 print(f"Successful, Results written to {results.name}")
         except Exception as e:
                 print(f"An unexcepted error occurred: {e}")  
+                
+    def plotting(self, command: int):
+        if command == 10:
+            ticker = input(f"Please Select Ticker from {', '.join(self.tickers)}: ")
+            plot.plot_closing_price(self.df_daily ,ticker)
+        elif command == 11:
+            plot.plot_all_closing_prices(self.df_daily, self.tickers)
         
     def execute(self):
         self.help()
@@ -66,6 +76,8 @@ Choose an option from the menu to get started.
                 continue
             if command == 0:
                 break
+            if command == 10 or command == 11:
+                self.plotting(command)
             if command not in self.query_menu:
                 print("Command should be a valid number from the menu")
                 print("Restarting....")
