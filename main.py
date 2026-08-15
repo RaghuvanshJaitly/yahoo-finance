@@ -6,6 +6,7 @@ import database as db
 import matplotlib.pyplot as plt
 import Application
 
+
 #tickers
 tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]
 
@@ -58,7 +59,7 @@ def update_stock_database(tickers, conn: sqlite3.Connection) -> tuple[pd.DataFra
     db.save_dataframe_summary(df_summary, 'stocks_summary',conn)
     db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
     
-    return df_summary, df_daily
+    return df_summary, df_daily  
     
 #def needs_update_today(conn: sqlite3.Connection) -> bool:
     

@@ -1,9 +1,12 @@
 import queries
 import plot
 import pandas as pd
+from scipy.stats import pearsonr
+import numpy as np
+
 # Handles User side interaction to handle queries and seperate logic from main method
 class Application:
-
+    
     def __init__(self, tickers, conn, df_daily: pd.DataFrame):
         self.tickers = tickers
         self.conn = conn
@@ -19,7 +22,8 @@ class Application:
     8: "Number of Days Above Average Volume",
     9: "Compare Each Day's Closing Price with the Previous Day",
     10: "Plot Closing Price for a Ticker",
-    11: "Plot Normalized Closing Price for each Ticker "
+    11: "Plot Normalized Closing Price for each Ticker",
+    12: "Find Correlation between Volume and Daily Return %"
     }
         self.our_queries = {
     1: queries.get_highest_volume_day,
@@ -59,9 +63,21 @@ Choose an option from the menu to get started.
     def plotting(self, command: int):
         if command == 10:
             ticker = input(f"Please Select Ticker from {', '.join(self.tickers)}: ")
-            plot.plot_closing_price(self.df_daily ,ticker)
+            plot.plot_closing_price(self.df_daily ,ticker.upper())
         elif command == 11:
             plot.plot_all_closing_prices(self.df_daily, self.tickers)
+            
+    def volume_return_correlation(self):
+        for ticker in self.tickers:
+            ticker_df = self.df_daily[self.df_daily["Tickers"] == ticker]
+            vol = ticker_df["Volume"].to_numpy()
+            daily_return = ticker_df["Daily Return %"].to_numpy()
+            abs_daily_return = np.abs(daily_return)
+            valid = ~np.isnan(abs_daily_return)
+            abs_daily_return = abs_daily_return[valid]
+            vol = vol[valid]
+            corr = pearsonr(abs_daily_return, vol)
+            print(f"{ticker}: correlation coefficient between volume and daily return: {corr.statistic:.3f}")
         
     def execute(self):
         self.help()
@@ -76,9 +92,11 @@ Choose an option from the menu to get started.
                 continue
             if command == 0:
                 break
-            if command == 10 or command == 11:
+            elif command in (10, 11):
                 self.plotting(command)
-            if command not in self.query_menu:
+            elif command == 12:
+                self.volume_return_correlation()
+            elif command not in self.query_menu:
                 print("Command should be a valid number from the menu")
                 print("Restarting....")
                 continue
