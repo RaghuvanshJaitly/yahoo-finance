@@ -34,3 +34,22 @@ def plot_all_closing_prices(df: pd.DataFrame, tickers: list):
     plt.legend()
     plt.grid(True)
     plt.show()
+
+#subplots each ticker's closing price
+def subplot_closing_prices(df: pd.DataFrame, tickers: list):
+    fig, ax = plt.subplots(3,2)
+    ax = ax.flatten()
+    for i, ticker in enumerate(tickers):
+        ticker_df = df[df["Tickers"] == ticker].copy()
+        ticker_df["Date"] = pd.to_datetime(ticker_df["Date"])
+        ticker_df = ticker_df.sort_values("Date")
+        normalized_close = ticker_df["Close"]/ticker_df["Close"].iloc[0] * 100 
+        ticker_df["normalized_close"] = normalized_close
+        ax[i].plot(ticker_df["Date"], ticker_df["normalized_close"])
+        ax[i].set_title(f"{ticker} Normalized stock growth over time")
+        ax[i].set_ylabel("Growth Index, starting at 100")
+        ax[i].set_xlabel("Date")
+        ax[i].grid(True)
+    ax[5].remove()
+    plt.tight_layout()
+    plt.show()

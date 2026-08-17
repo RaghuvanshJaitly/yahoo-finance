@@ -23,7 +23,8 @@ class Application:
     9: "Compare Each Day's Closing Price with the Previous Day",
     10: "Plot Closing Price for a Ticker",
     11: "Plot Normalized Closing Price for each Ticker",
-    12: "Find Correlation between Volume and Daily Return %"
+    12: "SubPlot Normalized Closing Price for each Ticker",
+    13: "Find Correlation between Volume and Daily Return %"
     }
         self.our_queries = {
     1: queries.get_highest_volume_day,
@@ -66,6 +67,8 @@ Choose an option from the menu to get started.
             plot.plot_closing_price(self.df_daily ,ticker.upper())
         elif command == 11:
             plot.plot_all_closing_prices(self.df_daily, self.tickers)
+        elif command == 12:
+            plot.subplot_closing_prices(self.df_daily, self.tickers)
             
     def volume_return_correlation(self):
         for ticker in self.tickers:
@@ -92,9 +95,9 @@ Choose an option from the menu to get started.
                 continue
             if command == 0:
                 break
-            elif command in (10, 11):
+            elif command in (10, 11, 12):
                 self.plotting(command)
-            elif command == 12:
+            elif command == 13:
                 self.volume_return_correlation()
             elif command not in self.query_menu:
                 print("Command should be a valid number from the menu")
