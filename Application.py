@@ -8,10 +8,10 @@ import numpy as np
 class Application:
     
     def __init__(self, tickers, conn, df_daily: pd.DataFrame):
-        self.tickers = tickers
-        self.conn = conn
-        self.df_daily = df_daily
-        self.query_menu = {
+        self._tickers = tickers
+        self._conn = conn
+        self._df_daily = df_daily
+        self._query_menu = {
     1: "Highest Volume Day",
     2: "Highest Closing Day",
     3: "Biggest Daily Return",
@@ -26,7 +26,7 @@ class Application:
     12: "SubPlot Normalized Closing Price for each Ticker",
     13: "Find Correlation between Volume and Daily Return %"
     }
-        self.our_queries = {
+        self._our_queries = {
     1: queries.get_highest_volume_day,
     2: queries.get_highest_close_day,
     3: queries.get_biggest_daily_return,
@@ -37,7 +37,7 @@ class Application:
     8: queries.days_above_avg_vol,
     9: queries.previous_day_close}
     
-    def help(self):
+    def _help(self):
         print("""
 Welcome to the Stock Analysis Application!
 
@@ -48,31 +48,34 @@ You can view price and volume statistics, daily returns, monthly trends, previou
 Choose an option from the menu to get started.
 """)
         print("0: exit")
-        for command, option in self.query_menu.items():
+        for command, option in self._query_menu.items():
             print(f"{command}: {option}")
             
-    def query_handler(self, command: int, ticker: str):
+    def _query_handler(self, command: int, ticker: str):
         try:
             with open("results.txt", 'a+') as results:
-                query = self.our_queries[command](ticker, self.conn)
-                results.write(f"\n{self.query_menu[command]}\n")
+                query = self._our_queries[command](ticker, self._conn)
+                results.write(f"\n{self._query_menu[command]}\n")
                 results.write(f"\n{query.to_string(index=False)}\n")
                 print(f"Successful, Results written to {results.name}")
         except Exception as e:
-                print(f"An unexcepted error occurred: {e}")  
+                print(f"An unexpected error occurred: {e}")  
                 
-    def plotting(self, command: int):
+    def _plotting(self, command: int):
         if command == 10:
-            ticker = input(f"Please Select Ticker from {', '.join(self.tickers)}: ")
-            plot.plot_closing_price(self.df_daily ,ticker.upper())
+            ticker = input(f"Please Select Ticker from {', '.join(self._tickers)}: ")
+            if ticker.upper() not in self._tickers:
+                        print(f"Ticker should be selected from {', '.join(self._tickers)}")
+                        return
+            plot.plot_closing_price(self._df_daily ,ticker.upper())
         elif command == 11:
-            plot.plot_all_closing_prices(self.df_daily, self.tickers)
+            plot.plot_all_closing_prices(self._df_daily, self._tickers)
         elif command == 12:
-            plot.subplot_closing_prices(self.df_daily, self.tickers)
+            plot.subplot_closing_prices(self._df_daily, self._tickers)
             
-    def volume_return_correlation(self):
-        for ticker in self.tickers:
-            ticker_df = self.df_daily[self.df_daily["Tickers"] == ticker]
+    def _volume_return_correlation(self):
+        for ticker in self._tickers:
+            ticker_df = self._df_daily[self._df_daily["Tickers"] == ticker]
             vol = ticker_df["Volume"].to_numpy()
             daily_return = ticker_df["Daily Return %"].to_numpy()
             abs_daily_return = np.abs(daily_return)
@@ -83,7 +86,7 @@ Choose an option from the menu to get started.
             print(f"{ticker}: correlation coefficient between volume and daily return: {corr.statistic:.3f}")
         
     def execute(self):
-        self.help()
+        self._help()
         print()
         while True:
             try:
@@ -96,16 +99,16 @@ Choose an option from the menu to get started.
             if command == 0:
                 break
             elif command in (10, 11, 12):
-                self.plotting(command)
+                self._plotting(command)
             elif command == 13:
-                self.volume_return_correlation()
-            elif command not in self.query_menu:
+                self._volume_return_correlation()
+            elif command not in self._query_menu:
                 print("Command should be a valid number from the menu")
                 print("Restarting....")
                 continue
             else:
-                ticker = input(f"Please Select Ticker from {', '.join(self.tickers)}: ")
-                if ticker.upper() not in self.tickers:
-                        print(f"Ticker should be selected from {', '.join(self.tickers)}")
+                ticker = input(f"Please Select Ticker from {', '.join(self._tickers)}: ")
+                if ticker.upper() not in self._tickers:
+                        print(f"Ticker should be selected from {', '.join(self._tickers)}")
                         continue
-                self.query_handler(command, ticker.upper())
+                self._query_handler(command, ticker.upper())
