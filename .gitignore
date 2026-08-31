@@ -1,3 +1,4 @@
+venv_broken_backup/
 venv/
 __pycache__/
 *.pyc
