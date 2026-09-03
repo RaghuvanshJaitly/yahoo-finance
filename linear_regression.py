@@ -1,4 +1,7 @@
 import numpy as np
+import sklearn
+from sklearn.linear_model import LinearRegression
+
 class SimpleLinearRegression:
     def __init__(self):
         self.slope = 0
@@ -44,17 +47,32 @@ class SimpleLinearRegression:
 
 if __name__ == "__main__":
     X= np.array([1, 2, 3, 4, 5])
+    sk_X = np.array([1, 2, 3, 4, 5]).reshape(-1, 1)
     y = np.array([3, 5, 7, 8, 11])
+    #SimpleLinearRegression object
     model = SimpleLinearRegression()
     slope, intercept = model.fit(X, y)
     y_fit = model.predict(X)
     residual = model.residuals(X, y)
     squaered_residual = model.squared_residuals(X, y)
     sse = model.SSE(X, y)
+    
+    #Sklearn object
+    sk_model = LinearRegression(fit_intercept=True)
+    sk_model.fit(sk_X, y)
+    sk_y_fit = sk_model.predict(sk_X)
+    sk_residual = y - sk_y_fit
+    print("My SimpleLinearRegression Class results:")
     print(f"Slope: {slope}")
     print(f"y-Intercept: {intercept}")
     print(f"y-fit: {y_fit}")
     print(f"Residual: {residual}")
     print(f"Squared Residual: {squaered_residual}")
     print(f"Sum of Squared Errors: {sse}")
+    print()
+    print("Sklearn's results:")
+    print(f"Sklearn Slope: {sk_model.coef_}")
+    print(f"Sklearn y-Intercept: {sk_model.intercept_}")
+    print(f"Sklearn y-fit: {sk_y_fit}")
+    print(f"Residual: {sk_residual}")
     
