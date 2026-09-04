@@ -1,6 +1,7 @@
 import numpy as np
 import sklearn
 from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
 
 class SimpleLinearRegression:
     def __init__(self):
@@ -76,3 +77,7 @@ if __name__ == "__main__":
     print(f"Sklearn y-fit: {sk_y_fit}")
     print(f"Residual: {sk_residual}")
     
+    #plot x and y vs x and y_fit
+    plt.plot(X, y)
+    plt.plot(X, y_fit)
+    plt.show()
