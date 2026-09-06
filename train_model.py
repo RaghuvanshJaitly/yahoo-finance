@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 
 #importing data
 conn, cursor = db.connect_db()
-aapl = db.run_query("""SELECT Tickers, Date, Open,
-                          High, Low, Close,Volume
+aapl = db.run_query("""SELECT Tickers, Date, Close
                           FROM daily_stock_prices
                           WHERE Tickers = ?
                           ORDER BY Date ASC""", conn, ("AAPL",))
@@ -19,7 +18,7 @@ aapl["Date"] = aapl["Date"].dt.tz_convert('America/New_York')
 aapl = aapl.set_index('Date')
 
 #Cleaning Data
-X = aapl[["Open", "High","Low", "Close", "Volume"]]
+X = aapl["Close"].to_frame()
 y = aapl["Close Tomorrow"]
 X = X.iloc[:-1]
 y = y.iloc[:-1]
@@ -60,7 +59,7 @@ print(f"Root mean Squared Error (Test): ${rmse_test:.2f}")
 #Plot Results
 plt.plot(X_test.index,y_test, label="Actual")
 plt.plot(X_test.index, y_fit_test, label="Predicted")
-plt.title("Actual vs Predicted Close (Multi-feature Linear Regression)")
+plt.title("Actual vs Predicted Close (Close only Linear Regression)")
 plt.legend()
 plt.show()
 
