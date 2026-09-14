@@ -33,6 +33,7 @@ def create_summary_dataframe(summary: dict) -> pd.DataFrame:
 def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
     df_daily = pd.concat(raw_data)
     df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
+    df_daily = df_daily.sort_values(["Tickers", "Date"])
     return df_daily
 
 #calculate the percentage change between today's and yesterday's close

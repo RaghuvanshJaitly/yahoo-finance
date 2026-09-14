@@ -3,13 +3,14 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
 #Calculate fresh daily_return values
-def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
-    previous_close = df_daily.groupby("Tickers")["Close"].shift(1)
-    df_daily["Daily Return %"] = (((df_daily["Close"] - previous_close) / previous_close * 100)).round(2)
+def calculate_daily_returns(df: pd.DataFrame) -> pd.DataFrame:
+    previous_close = df.groupby("Tickers")["Close"].shift(1)
+    df["Daily Return %"] = (((df["Close"] - previous_close) / previous_close * 100)).round(2)
     
-    return df_daily
+    return df
 
 #importing data
 conn, cursor = db.connect_db()
@@ -44,43 +45,48 @@ y_train = y.iloc[:split_idx]
 X_test = X.iloc[split_idx:,]
 y_test = y.iloc[split_idx:]
 
-#Training
-model = LinearRegression(fit_intercept=True)
-model.fit(X_train, y_train)
-print(f"Coefficient: {model.coef_}")
-print(f"y-Intercept: {model.intercept_}")
-y_fit = model.predict(X_train)
-y_fit_test = model.predict(X_test)
-print(y_train.head())
-print(f"y-fit: {y_fit[:5]}")
-residual = y_train - y_fit
-sse = np.sum(np.square(residual))
-mse = sse/len(y_fit)
-rmse = np.sqrt(mse)
-print(f"Root mean Squared Error: {rmse:.2f}")
+with open("model_results.txt", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f, delimiter="\t")
 
-#Testing
-residual_test = y_test - y_fit_test
-sse_test = np.sum(np.square(residual_test))
-mse_test = sse_test/len(y_fit_test)
-rmse_test = np.sqrt(mse_test)
-print(f"Root mean Squared Error (Test): {rmse_test:.2f}")
+    #Training
+    model = LinearRegression(fit_intercept=True)
+    model.fit(X_train, y_train)
+    print(f"Coefficient: {model.coef_}")
+    print(f"y-Intercept: {model.intercept_}")
+    y_fit = model.predict(X_train)
+    y_fit_test = model.predict(X_test)
+    print(y_train.head())
+    print(f"y-fit: {y_fit[:5]}")
+    residual = y_train - y_fit
+    sse = np.sum(np.square(residual))
+    mse = sse/len(y_fit)
+    rmse = np.sqrt(mse)
+    print(f"Root mean Squared Error: {rmse:.2f}")
 
-#Plot Results
-plt.plot(X_test.index,y_test, label="Actual")
-plt.plot(X_test.index, y_fit_test, label="Predicted")
-plt.title("Actual vs Predicted Daily Return %")
-plt.legend()
-plt.show()
+    #Testing
+    residual_test = y_test - y_fit_test
+    sse_test = np.sum(np.square(residual_test))
+    mse_test = sse_test/len(y_fit_test)
+    rmse_test = np.sqrt(mse_test)
+    print(f"Root mean Squared Error (Test): {rmse_test:.2f}")
 
-#Naive Baseline
-naive_y_fit = 0
-naive_residual = y_test - naive_y_fit
-naive_sse = np.sum(np.square(naive_residual))
-naive_mse = naive_sse/len(y_test)
-naive_rmse = np.sqrt(naive_mse)
-print(f"Naive Baseline Root mean Squared Error: {naive_rmse:.2f}")
+    #Plot Results
+    plt.plot(X_test.index,y_test, label="Actual")
+    plt.plot(X_test.index, y_fit_test, label="Predicted")
+    plt.title("Actual vs Predicted Daily Return %")
+    plt.legend()
+    plt.show()
 
-#R^2
-rsq = model.score(X_test, y_test)
-print(f"Coefficient of Determiniation {rsq}")
+    #Naive Baseline
+    naive_y_fit = 0
+    naive_residual = y_test - naive_y_fit
+    naive_sse = np.sum(np.square(naive_residual))
+    naive_mse = naive_sse/len(y_test)
+    naive_rmse = np.sqrt(naive_mse)
+    print(f"Naive Baseline Root mean Squared Error: {naive_rmse:.2f}")
+
+    #R^2
+    rsq = model.score(X_test, y_test)
+    print(f"Coefficient of Determiniation {rsq}")
+    
+    writer.writerows()
