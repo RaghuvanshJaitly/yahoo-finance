@@ -40,13 +40,13 @@ def get_worst_daily_return(ticker: str, conn: sqlite3.Connection) -> pd.DataFram
     return result
 
 #top 10 volume days
-def top_ten_volume_days(ticker: str, conn: sqlite3.Connection) -> pd.DataFrame:
+def top_ten_volume_days(ticker: str, conn: sqlite3.Connection, limit: int = 10) -> pd.DataFrame:
     result = db.run_query("""SELECT Tickers, Date, Volume
                           FROM daily_stock_prices
                           WHERE Tickers = ? 
                           ORDER BY Volume DESC
-                          LIMIT 10
-                          """, conn, (ticker,))
+                          LIMIT ?
+                          """, conn, (ticker, limit))
     return result
 
 #Positive and Negative daily return% count for each ticker
