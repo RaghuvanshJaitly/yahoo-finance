@@ -5,7 +5,7 @@ __pycache__/
 stocks.db
 .DS_Store
 practice.py
-
+practice_test.py
 # SQLite database files
 *.db
 *.sqlite
