@@ -69,3 +69,18 @@ def test_top_vol_return_correct_rows(sample_db):
     "Volume": 400
   }]
     
+def test_highest_volume_return_correct_row(sample_db):
+    response = client.get("/stocks/aapl/highest-volume")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+    "Tickers": "AAPL",
+    "Date": "2026-01-02",
+    "Volume": 900
+  }
+    ]
+
+def test_highest_volume_no_record(sample_db):
+    response = client.get("/stocks/googl/highest-volume")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Records not found"}
