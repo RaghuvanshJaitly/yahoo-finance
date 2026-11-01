@@ -3,14 +3,9 @@ import sqlite3
 
 # connection to database
 def connect_db():
-    try:
-        conn = sqlite3.connect('stocks.db')
-        cursor = conn.cursor()
-        print("Connected to DB")
-        return conn, cursor
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
+    conn = sqlite3.connect('stocks.db', check_same_thread=False)
+    print("Connected to DB")
+    return conn
 
 #create daily prices table with unique identifiers
 def create_table_daily(cursor: sqlite3.Cursor, table_name: str):

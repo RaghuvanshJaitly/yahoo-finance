@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 from api import app
 import pytest
 import api
-import pandas as pd
 import sqlite3
 import database as db
 
@@ -51,9 +50,8 @@ def sample_db(monkeypatch, tmp_path):
     conn.close()
 
     def replacement_function():
-        test_conn = sqlite3.connect(db_file)
-        test_cursor = test_conn.cursor()
-        return test_conn, test_cursor
+        test_conn = sqlite3.connect(db_file, check_same_thread=False)
+        return test_conn
     monkeypatch.setattr(api.db, "connect_db", replacement_function)
     
 def test_top_vol_return_correct_rows(sample_db):
