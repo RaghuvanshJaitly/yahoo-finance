@@ -1,5 +1,8 @@
 import pandas as pd
 import sqlite3
+import os 
+from dotenv import load_dotenv
+import psycopg
 
 # connection to database
 def connect_db():
@@ -7,6 +10,14 @@ def connect_db():
     print("Connected to DB")
     return conn
 
+#load the .env file and get database url
+#connect to postgresql with the database url
+def connect_postgres():
+    load_dotenv()
+    db_url = os.getenv("DATABASE_URL")
+    conn = psycopg.connect(db_url)
+    return conn
+    
 #create daily prices table with unique identifiers
 def create_table_daily(cursor: sqlite3.Cursor, table_name: str):
     cursor.execute(f"""
@@ -50,3 +61,6 @@ def save_dataframe_summary(dataframe:pd.DataFrame, table_name: str, conn: sqlite
 def run_query(query:str, conn: sqlite3.Connection, params) -> pd.DataFrame:
     result = pd.read_sql_query(query, conn, params=params)
     return result
+
+if __name__ == "__main__":
+    print(connect_postgres())

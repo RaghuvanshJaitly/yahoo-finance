@@ -35,6 +35,22 @@ def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
     df_daily = df_daily.reset_index().rename(columns={"level_0":"Tickers"})
     df_daily = df_daily.sort_values(["Tickers", "Date"])
     return df_daily
+#prepare postgres dataframe
+def prepare_postgres_dataframe(df_daily: pd.DataFrame) -> pd.DataFrame:
+    df_copy = df_daily.copy()
+    df_copy = df_copy.rename(columns={
+    "Tickers": "tickers",
+    "Date": "date",
+    "Open": "open",
+    "High": "high",
+    "Low": "low",
+    "Close": "close",
+    "Volume": "volume",
+    "Dividends": "dividends",
+    "Stock Splits": "stock_splits",
+    "Daily Return %": "daily_return_pct"})
+    
+    return df_copy
 
 #calculate the percentage change between today's and yesterday's close
 def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
@@ -54,5 +70,3 @@ def update_stock_database(tickers, conn: sqlite3.Connection) -> tuple[pd.DataFra
     db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
     
     return df_summary, df_daily  
-    
-#def needs_update_today(conn: sqlite3.Connection) -> bool:
