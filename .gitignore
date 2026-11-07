@@ -1,5 +1,6 @@
 venv_broken_backup/
 venv/
+.pytest_cache
 __pycache__/
 .env
 *.pyc
@@ -17,3 +18,4 @@ practice_test.py
 *.sqlite-journal
 *.sqlite-wal
 *.sqlite-shm
+postgres_experiments.py

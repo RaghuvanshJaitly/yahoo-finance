@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 import psycopg
 
-# connection to database
+# connection to sqlite database
 def connect_db():
     conn = sqlite3.connect('stocks.db', check_same_thread=False)
     print("Connected to DB")
@@ -57,6 +57,23 @@ def save_dataframe_summary(dataframe:pd.DataFrame, table_name: str, conn: sqlite
         index=False
     )
 
+#save postgres dataframe into postgres database
+def save_postgres_dataframe(df: pd.DataFrame, conn: psycopg.Connection):
+    with conn.cursor() as cursor:
+        data = list(df.itertuples(index=False, name=None))
+        cursor.executemany("""INSERT INTO daily_stock_prices ("tickers", "date", "open", "high", "low", "close", "volume", "dividends", "stock_splits", "daily_return_pct")
+                       VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                       ON CONFLICT(tickers, date)
+                       DO UPDATE SET
+                       open = EXCLUDED.open,
+                       high = EXCLUDED.high,
+                       low = EXCLUDED.low,
+                       close = EXCLUDED.close,
+                       volume = EXCLUDED.volume,
+                       dividends = EXCLUDED.dividends,
+                       stock_splits = EXCLUDED.stock_splits,
+                       daily_return_pct = EXCLUDED.daily_return_pct""", data)
+    
 # run query and save it in pandas df
 def run_query(query:str, conn: sqlite3.Connection, params) -> pd.DataFrame:
     result = pd.read_sql_query(query, conn, params=params)
