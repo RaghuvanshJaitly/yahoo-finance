@@ -1,0 +1,5 @@
+# 1. Start the PostgreSQL Docker container
+docker start yahoo-postgres
+
+# 2. Connect to PostgreSQL
+docker exec -it yahoo-postgres psql -U rag -d stocks

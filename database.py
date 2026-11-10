@@ -79,5 +79,16 @@ def run_query(query:str, conn: sqlite3.Connection, params) -> pd.DataFrame:
     result = pd.read_sql_query(query, conn, params=params)
     return result
 
+# run query and save it in pandas df
+def run_query_postgres(query: str, conn: psycopg.Connection, params) -> pd.DataFrame:
+    with conn.cursor() as cursor:
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        cols = [col[0] for col in cursor.description]
+        result_df = pd.DataFrame(rows, columns=cols)
+        
+    return result_df
+
 if __name__ == "__main__":
-    print(connect_postgres())
+
+    pass
