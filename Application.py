@@ -3,11 +3,12 @@ import plot
 import pandas as pd
 from scipy.stats import pearsonr
 import numpy as np
+import psycopg
 
 # Handles User side interaction to handle queries and seperate logic from main method
 class Application:
     
-    def __init__(self, tickers, conn, df_daily: pd.DataFrame):
+    def __init__(self, tickers: list, conn: psycopg.Connection, df_daily: pd.DataFrame):
         self._tickers = tickers
         self._conn = conn
         self._df_daily = df_daily
@@ -27,15 +28,15 @@ class Application:
     13: "Find Correlation between Volume and Daily Return %"
     }
         self._our_queries = {
-    1: queries.get_highest_volume_day,
-    2: queries.get_highest_close_day,
-    3: queries.get_biggest_daily_return,
-    4: queries.get_worst_daily_return,
-    5: queries.top_ten_volume_days,
-    6: queries.positive_and_negative_count,
-    7: queries.average_monthly_close,
-    8: queries.days_above_avg_vol,
-    9: queries.previous_day_close}
+    1: queries.get_highest_volume_day_postgres,
+    2: queries.get_highest_close_day_postgres,
+    3: queries.get_biggest_daily_return_postgres,
+    4: queries.get_worst_daily_return_postgres,
+    5: queries.top_ten_volume_days_postgres,
+    6: queries.positive_and_negative_count_postgres,
+    7: queries.average_monthly_close_postgres,
+    8: queries.days_above_avg_vol_postgres,
+    9: queries.previous_day_close_postgres}
     
     def _help(self):
         print("""
@@ -54,7 +55,25 @@ Choose an option from the menu to get started.
     def _query_handler(self, command: int, ticker: str):
         try:
             with open("results.txt", 'a+') as results:
-                query = self._our_queries[command](ticker, self._conn)
+                if command == 9:
+                    prev_day_close_limit = input("Please specify the number of rows required (default 50):")
+                    
+                    if prev_day_close_limit == "":
+                        query = self._our_queries[9](ticker, self._conn)
+                        
+                    else:
+                        try:
+                            prev_day_close_limit = int(prev_day_close_limit)
+                            if prev_day_close_limit <= 0:
+                                raise ValueError("Please enter a valid positive integer")
+                                
+                        except ValueError:
+                            print("Please enter a valid positive integer")
+                            return
+                        query = self._our_queries[9](ticker, self._conn, prev_day_close_limit)
+                
+                else:   
+                    query = self._our_queries[command](ticker, self._conn)
                 results.write(f"\n{self._query_menu[command]}\n")
                 results.write(f"\n{query.to_string(index=False)}\n")
                 print(f"Successful, Results written to {results.name}")
@@ -108,7 +127,7 @@ Choose an option from the menu to get started.
                 continue
             else:
                 ticker = input(f"Please Select Ticker from {', '.join(self._tickers)}: ")
-                if ticker.upper() not in self._tickers:
+                if ticker.upper().strip() not in self._tickers:
                         print(f"Ticker should be selected from {', '.join(self._tickers)}")
                         continue
                 self._query_handler(command, ticker.upper())
