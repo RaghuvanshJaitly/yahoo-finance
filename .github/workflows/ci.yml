@@ -1,0 +1,41 @@
+name: CI
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        services:
+            postgres:
+                image: postgres:17
+                env: 
+                    POSTGRES_DB: stocks_test
+                    POSTGRES_USER: rag
+                    POSTGRES_PASSWORD: testpassword
+                ports: 
+                    - "5432:5432"
+                options: 
+                    >-
+                        --health-cmd="pg_isready -U rag -d stocks_test"
+                        --health-interval=10s
+                        --health-timeout=5s
+                        --health-retries=5
+        steps:
+            - name: "checkout repository"
+              uses: "actions/checkout@v4"
+            - name: "Set up Python"
+              uses: "actions/setup-python@v5"
+              with:
+                 python-version: '3.13'
+            - name: "Install Dependencies"
+              run: "pip install -r requirements.txt"
+            - name: "Initialize Database"
+              env: 
+                PGPASSWORD: testpassword
+              run: psql -h localhost -p 5432 -U rag -d stocks_test -f schema.sql -v ON_ERROR_STOP=1 
+            - name: "Run Tests"
+              env: 
+                TEST_DATABASE_URL: postgresql://rag:testpassword@localhost:5432/stocks_test
+              run: pytest api_test.py -v
