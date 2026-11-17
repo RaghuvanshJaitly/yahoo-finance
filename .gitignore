@@ -19,3 +19,4 @@ practice_test.py
 *.sqlite-wal
 *.sqlite-shm
 postgres_experiments.py
+ci_terminology.md
