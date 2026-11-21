@@ -96,3 +96,37 @@ def test_highest_volume_no_record(sample_db):
     response = client.get("/stocks/googl/highest-volume")
     assert response.status_code == 404
     assert response.json() == {"detail": "Records not found"}
+    
+def test_historical_price_records(sample_db):
+    response = client.get("/stocks/aapl/prices?limit=2")
+    assert response.status_code == 200
+    assert response.json() == [
+  {
+    "tickers": "AAPL",
+    "date": "2026-01-03",
+    "open": None,
+    "high": None,
+    "low": None,
+    "close": None,
+    "volume": 400,
+    "daily_return_pct": None
+  },
+  {
+    "tickers": "AAPL",
+    "date": "2026-01-02",
+    "open": None,
+    "high": None,
+    "low": None,
+    "close": None,
+    "volume": 900,
+    "daily_return_pct": None
+  }]
+
+def test_historical_price_records_invalid_limit():
+    response = client.get("/stocks/aapl/prices?limit=0")
+    assert response.status_code == 422
+    
+def test_historical_prices_no_records():
+    response = client.get("/stocks/googl/prices")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Records not found"}

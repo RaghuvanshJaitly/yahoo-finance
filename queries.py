@@ -103,6 +103,15 @@ def  previous_day_close(ticker: str, conn:psycopg.Connection, limit: int=50) -> 
                           """, conn, (ticker, limit))
     return result
 
+def get_historical_prices(ticker:str, conn:psycopg.Connection, limit: int=30) -> pd.DataFrame:
+    result = db.run_query_postgres("""
+                                   SELECT tickers, date, open, high, low, close, volume, daily_return_pct
+                                   FROM daily_stock_prices
+                                   WHERE tickers = %s
+                                   ORDER BY date DESC
+                                   LIMIT %s
+                                   """, conn, (ticker, limit))
+    return result
+
 if __name__ == "__main__":
- 
- pass
+    pass
