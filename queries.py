@@ -4,7 +4,7 @@ import psycopg
 
 #named report functions
 
-def get_highest_volume_day_postgres(ticker: str, conn: psycopg.Connection) -> pd.DataFrame:
+def get_highest_volume_day(ticker: str, conn: psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, Volume
                           FROM daily_stock_prices
                           WHERE tickers = %s AND
@@ -12,7 +12,7 @@ def get_highest_volume_day_postgres(ticker: str, conn: psycopg.Connection) -> pd
                           FROM daily_stock_prices WHERE tickers = %s)""", conn, (ticker, ticker))
     return result
 
-def get_highest_close_day_postgres(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
+def get_highest_close_day(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, close
                           FROM daily_stock_prices
                           WHERE tickers = %s AND
@@ -21,7 +21,7 @@ def get_highest_close_day_postgres(ticker:str, conn:psycopg.Connection) -> pd.Da
     return result
 
 #biggest daily return
-def get_biggest_daily_return_postgres(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
+def get_biggest_daily_return(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, daily_return_pct
                           FROM daily_stock_prices
                           WHERE tickers = %s AND daily_return_pct 
@@ -31,7 +31,7 @@ def get_biggest_daily_return_postgres(ticker:str, conn:psycopg.Connection) -> pd
     return result
 
 #worst daily return
-def get_worst_daily_return_postgres(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
+def get_worst_daily_return(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, daily_return_pct
                           FROM daily_stock_prices
                           WHERE tickers = %s AND daily_return_pct
@@ -42,7 +42,7 @@ def get_worst_daily_return_postgres(ticker: str, conn:psycopg.Connection) -> pd.
     return result
 
 #top 10 volume days
-def top_ten_volume_days_postgres(ticker: str, conn:psycopg.Connection, limit: int = 10) -> pd.DataFrame:
+def top_ten_volume_days(ticker: str, conn:psycopg.Connection, limit: int = 10) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, volume
                           FROM daily_stock_prices
                           WHERE tickers = %s
@@ -52,7 +52,7 @@ def top_ten_volume_days_postgres(ticker: str, conn:psycopg.Connection, limit: in
     return result
 
 #Positive and Negative daily return% count for each ticker
-def positive_and_negative_count_postgres(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
+def positive_and_negative_count(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers,
                           COUNT(CASE WHEN daily_return_pct > 0
                           THEN 1
@@ -67,7 +67,7 @@ def positive_and_negative_count_postgres(ticker: str, conn:psycopg.Connection) -
     return result
 
 #Average monthly Close
-def average_monthly_close_postgres(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
+def average_monthly_close(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, TO_CHAR(date, 'YYYY-MM') AS order_month,
                           AVG(close) as average_close
                           FROM daily_stock_prices
@@ -78,7 +78,7 @@ def average_monthly_close_postgres(ticker:str, conn:psycopg.Connection) -> pd.Da
     return result
 
 #count of days above avg vol
-def days_above_avg_vol_postgres(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
+def days_above_avg_vol(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT COUNT(*) as days_above_avg
                           FROM daily_stock_prices WHERE
                           tickers = %s AND
@@ -89,7 +89,7 @@ def days_above_avg_vol_postgres(ticker: str, conn:psycopg.Connection) -> pd.Data
     return result
 
 #previous day's close
-def  previous_day_close_postgres(ticker: str, conn:psycopg.Connection, limit: int=50) -> pd.DataFrame:
+def  previous_day_close(ticker: str, conn:psycopg.Connection, limit: int=50) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date,
                           close, LAG(close)
                            OVER(

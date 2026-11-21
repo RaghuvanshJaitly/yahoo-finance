@@ -28,15 +28,15 @@ class Application:
     13: "Find Correlation between Volume and Daily Return %"
     }
         self._our_queries = {
-    1: queries.get_highest_volume_day_postgres,
-    2: queries.get_highest_close_day_postgres,
-    3: queries.get_biggest_daily_return_postgres,
-    4: queries.get_worst_daily_return_postgres,
-    5: queries.top_ten_volume_days_postgres,
-    6: queries.positive_and_negative_count_postgres,
-    7: queries.average_monthly_close_postgres,
-    8: queries.days_above_avg_vol_postgres,
-    9: queries.previous_day_close_postgres}
+    1: queries.get_highest_volume_day,
+    2: queries.get_highest_close_day,
+    3: queries.get_biggest_daily_return,
+    4: queries.get_worst_daily_return,
+    5: queries.top_ten_volume_days,
+    6: queries.positive_and_negative_count,
+    7: queries.average_monthly_close,
+    8: queries.days_above_avg_vol,
+    9: queries.previous_day_close}
     
     def _help(self):
         print("""
