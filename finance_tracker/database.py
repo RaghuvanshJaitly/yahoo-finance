@@ -26,7 +26,8 @@ def save_postgres_dataframe(df: pd.DataFrame, conn: psycopg.Connection):
                        volume = EXCLUDED.volume,
                        dividends = EXCLUDED.dividends,
                        stock_splits = EXCLUDED.stock_splits,
-                       daily_return_pct = EXCLUDED.daily_return_pct""", data)
+                       daily_return_pct = COALESCE( EXCLUDED.daily_return_pct,
+                       daily_stock_prices.daily_return_pct)""", data)
 
 # run query and save it in pandas df
 def run_query_postgres(query: str, conn: psycopg.Connection, params) -> pd.DataFrame:

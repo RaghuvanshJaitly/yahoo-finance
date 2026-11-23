@@ -113,5 +113,15 @@ def get_historical_prices(ticker:str, conn:psycopg.Connection, limit: int=30) ->
                                    """, conn, (ticker, limit))
     return result
 
+def get_latest_stored_date(ticker:str, conn:psycopg.Connection):
+    with conn.cursor() as cursor:
+        query = """ SELECT MAX(date)
+                    FROM daily_stock_prices
+                    WHERE tickers = %s
+                                    """
+        cursor.execute(query, (ticker,))
+        date = cursor.fetchone()
+    return date[0]
+
 if __name__ == "__main__":
     pass

@@ -2,32 +2,26 @@ import yfinance as yf
 import pandas as pd
 from finance_tracker import database as db
 import psycopg
+from finance_tracker import queries
+from datetime import timedelta, date
 
 #downloads stock data
-def download_stock_data(tickers: list)-> dict:
+def download_stock_data(tickers: list, start_dates=None)-> dict:
     raw_data = {}
     for ticker in tickers:
         ticker_object = yf.Ticker(ticker)
-        raw_data[ticker] = ticker_object.history(period="5y")
+        start_date = start_dates.get(ticker) if start_dates is not None else None
+        
+        if start_date is not None:
+            new_date = start_date - timedelta(days=5)
+            history = ticker_object.history(start=new_date)
+        else:
+            history = ticker_object.history(period="5y")
+        if history.empty:
+            print(f"No rows returned for {ticker}. Skipping.")
+            continue  
+        raw_data[ticker] = history                                  
     return raw_data
-
-#calculate summary from Raw data and save it in a dict
-def calculate_summary(raw_data: dict) -> dict:
-    summary = {}
-    for ticker in raw_data:
-    
-        summary[ticker] = {"Highest Close":raw_data[ticker]["Close"].max(),"Lowest Close" : raw_data[ticker]["Close"].min(),
-                     "Highest Volume": raw_data[ticker]["Volume"].max(), "Lowest Volume": raw_data[ticker]["Volume"].min(),
-                     "Average Close": raw_data[ticker]["Close"].mean(), "Average Volume":raw_data[ticker]["Volume"].mean(),
-                     "Median Close": raw_data[ticker]["Close"].median(), "Standard Deviation of Close": raw_data[ticker]["Close"].std()
-    }
-    return summary
-
-#dataframe for summaries
-def create_summary_dataframe(summary: dict) -> pd.DataFrame:
-    df_summary = (pd.DataFrame(summary)).transpose()
-    df_summary = df_summary.reset_index().rename(columns={"index": "Tickers"})
-    return df_summary
 
 #dataframe for daily prices
 def create_daily_dataframe(raw_data: dict) -> pd.DataFrame:
@@ -67,11 +61,21 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
 
 #update stock database in postgres with df_daily
 def update_postgres_database(tickers: list, conn: psycopg.Connection) -> pd.DataFrame:
-    raw_data = download_stock_data(tickers)
+    latest_date_dict = {}
+    for ticker in tickers:
+        latest_date_dict[ticker] = queries.get_latest_stored_date(ticker, conn)
+        
+    raw_data = download_stock_data(tickers, latest_date_dict)
+    if not raw_data:
+        raise RuntimeError("No stock data was downloaded for any requested ticker.")
     df_daily = create_daily_dataframe(raw_data)
     df_daily = calculate_daily_returns(df_daily)
     prepared_df = prepare_postgres_dataframe(df_daily)
     db.save_postgres_dataframe(prepared_df, conn)
-    
     return df_daily
-    
+
+if __name__ == "__main__":
+    tickers = []
+    with db.connect_postgres() as conn:
+        update_postgres_database(tickers, conn)
+        
