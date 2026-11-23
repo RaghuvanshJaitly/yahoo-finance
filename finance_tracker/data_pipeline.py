@@ -75,7 +75,4 @@ def update_postgres_database(tickers: list, conn: psycopg.Connection) -> pd.Data
     return df_daily
 
 if __name__ == "__main__":
-    tickers = []
-    with db.connect_postgres() as conn:
-        update_postgres_database(tickers, conn)
-        
+    pass

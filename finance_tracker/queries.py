@@ -123,5 +123,17 @@ def get_latest_stored_date(ticker:str, conn:psycopg.Connection):
         date = cursor.fetchone()
     return date[0]
 
+def get_analysis_history(tickers: list, conn:psycopg.Connection):
+    result = db.run_query_postgres("""SELECT
+        tickers AS "Tickers",
+        date AS "Date",
+        close AS "Close",
+        volume AS "Volume",
+        daily_return_pct AS "Daily Return %%"
+        FROM daily_stock_prices
+        WHERE tickers = ANY(%s)
+        ORDER BY tickers, date;""", conn, (tickers,))
+    return result
+
 if __name__ == "__main__":
     pass
