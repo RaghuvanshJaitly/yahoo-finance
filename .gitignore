@@ -6,8 +6,6 @@ __pycache__/
 *.pyc
 stocks.db
 .DS_Store
-practice.py
-practice_test.py
 # SQLite database files
 *.db
 *.sqlite
@@ -18,5 +16,4 @@ practice_test.py
 *.sqlite-journal
 *.sqlite-wal
 *.sqlite-shm
-postgres_experiments.py
-ci_terminology.md
+/ignore/

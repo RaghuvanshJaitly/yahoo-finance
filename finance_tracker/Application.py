@@ -1,5 +1,5 @@
-import queries
-import plot
+from finance_tracker import queries
+from finance_tracker import plot
 import pandas as pd
 from scipy.stats import pearsonr
 import numpy as np

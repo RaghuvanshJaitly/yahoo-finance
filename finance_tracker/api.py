@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-import queries
-import database as db
+from finance_tracker import queries
+from finance_tracker import database as db
 from typing import Annotated
 from fastapi import Query
 from pydantic import BaseModel

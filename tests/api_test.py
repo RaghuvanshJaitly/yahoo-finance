@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from api import app, get_db
+from finance_tracker.api import app, get_db
 import pytest
 import psycopg
 from dotenv import load_dotenv

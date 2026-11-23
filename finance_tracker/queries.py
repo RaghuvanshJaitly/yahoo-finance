@@ -1,4 +1,4 @@
-import database as db
+from finance_tracker import database as db
 import pandas as pd
 import psycopg
 

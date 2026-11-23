@@ -1,4 +1,4 @@
-import data_pipeline as pipeline
+from finance_tracker import data_pipeline as pipeline
 import pandas as pd
 from datetime import date
 

@@ -1,7 +1,7 @@
 print("starting main file")
-import database as db
-import Application
-import data_pipeline as pipeline
+from finance_tracker import database as db
+from finance_tracker import Application
+from finance_tracker import data_pipeline as pipeline
 #main method
 def main():
     tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "AMZN"]

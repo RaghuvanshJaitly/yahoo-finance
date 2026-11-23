@@ -1,7 +1,6 @@
 import yfinance as yf
 import pandas as pd
-import sqlite3
-import database as db
+from finance_tracker import database as db
 import psycopg
 
 #downloads stock data
@@ -65,18 +64,6 @@ def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
     df_daily["Daily Return %"] = (((df_daily["Close"] - previous_close) / previous_close * 100)).round(2)
     
     return df_daily
-
-#updates stock database with both summary and daily df
-def update_stock_database(tickers, conn: sqlite3.Connection) -> tuple[pd.DataFrame, pd.DataFrame]:
-    raw_data = download_stock_data(tickers)
-    summary = calculate_summary(raw_data)
-    df_summary = create_summary_dataframe(summary)
-    df_daily = create_daily_dataframe(raw_data)
-    df_daily = calculate_daily_returns(df_daily)
-    db.save_dataframe_summary(df_summary, 'stocks_summary',conn)
-    db.save_dataframe_daily(df_daily,'daily_stock_prices', conn )
-    
-    return df_summary, df_daily  
 
 #update stock database in postgres with df_daily
 def update_postgres_database(tickers: list, conn: psycopg.Connection) -> pd.DataFrame:
