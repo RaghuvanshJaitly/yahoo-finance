@@ -42,8 +42,7 @@ def prepare_postgres_dataframe(df_daily: pd.DataFrame) -> pd.DataFrame:
     "Close": "close",
     "Volume": "volume",
     "Dividends": "dividends",
-    "Stock Splits": "stock_splits",
-    "Daily Return %": "daily_return_pct"})
+    "Stock Splits": "stock_splits",})
     
     df_copy['date'] = pd.to_datetime(df_copy['date'])
     df_copy['date'] = df_copy['date'].dt.date
@@ -51,13 +50,6 @@ def prepare_postgres_dataframe(df_daily: pd.DataFrame) -> pd.DataFrame:
     df_copy = df_copy.where(pd.notna(df_copy), None)
     
     return df_copy
-
-#calculate the percentage change between today's and yesterday's close
-def calculate_daily_returns(df_daily: pd.DataFrame) -> pd.DataFrame:
-    previous_close = df_daily.groupby("Tickers")["Close"].shift(1)
-    df_daily["Daily Return %"] = (((df_daily["Close"] - previous_close) / previous_close * 100)).round(2)
-    
-    return df_daily
 
 #update stock database in postgres with df_daily
 def update_postgres_database(tickers: list, conn: psycopg.Connection) -> pd.DataFrame:
@@ -69,7 +61,6 @@ def update_postgres_database(tickers: list, conn: psycopg.Connection) -> pd.Data
     if not raw_data:
         raise RuntimeError("No stock data was downloaded for any requested ticker.")
     df_daily = create_daily_dataframe(raw_data)
-    df_daily = calculate_daily_returns(df_daily)
     prepared_df = prepare_postgres_dataframe(df_daily)
     db.save_postgres_dataframe(prepared_df, conn)
     return df_daily

@@ -4,6 +4,9 @@ import pytest
 import psycopg
 from dotenv import load_dotenv
 import os
+from finance_tracker import data_pipeline
+from unittest.mock import patch 
+import pandas as pd
 
 load_dotenv()
 
@@ -130,3 +133,38 @@ def test_historical_prices_no_records():
     response = client.get("/stocks/googl/prices")
     assert response.status_code == 404
     assert response.json() == {"detail": "Records not found"}
+
+# Check that correcting the first close in a refresh also updates its 
+# return using the previous day's stored close.
+def test_historical_prices_recalculates_return_when_first_close_in_refresh_changes(test_db):
+    conn = test_db
+    dates = pd.to_datetime([
+        "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23"
+    ])
+
+    first_history = pd.DataFrame({
+        "Open": [100.0, 102.0, 105.0, 106.0, 107.0],
+        "High": 110.0,
+        "Low": 95.0,
+        "Close": [100.0, 102.5, 105.0, 106.0, 107.0],
+        "Volume": 1000,
+        "Dividends": 0.0,
+        "Stock Splits": 0.0,
+    }, index=dates)
+    first_history.index.name = "Date"
+
+    corrected_history = first_history.loc["2026-11-18":].copy()
+    corrected_history.loc["2026-11-18", "Close"] = 104.0
+    with patch.object(data_pipeline.yf.Ticker, "history",
+                      side_effect=[first_history, corrected_history]):
+        data_pipeline.update_postgres_database(["AAPL"], conn)
+        data_pipeline.update_postgres_database(["AAPL"], conn)
+    response = client.get("/stocks/AAPL/prices")
+    
+    assert response.status_code == 200
+    rows = response.json()
+    matching_rows = [row for row in rows if row["date"] == "2026-11-18"]
+    assert len(matching_rows) == 1
+    assert matching_rows[0]["close"] == 104.0
+    assert matching_rows[0]["daily_return_pct"] == 4.0
+    

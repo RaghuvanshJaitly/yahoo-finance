@@ -23,20 +23,20 @@ def get_highest_close_day(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
 #biggest daily return
 def get_biggest_daily_return(ticker:str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, daily_return_pct
-                          FROM daily_stock_prices
+                          FROM public.daily_stock_prices_with_returns
                           WHERE tickers = %s AND daily_return_pct 
                           = (SELECT MAX(daily_return_pct)
-                          FROM daily_stock_prices
+                          FROM public.daily_stock_prices_with_returns
                           WHERE tickers = %s)""", conn, (ticker, ticker))
     return result
 
 #worst daily return
 def get_worst_daily_return(ticker: str, conn:psycopg.Connection) -> pd.DataFrame:
     result = db.run_query_postgres("""SELECT tickers, date, daily_return_pct
-                          FROM daily_stock_prices
+                          FROM public.daily_stock_prices_with_returns
                           WHERE tickers = %s AND daily_return_pct
                           = (SELECT MIN(daily_return_pct)
-                          FROM daily_stock_prices
+                          FROM public.daily_stock_prices_with_returns
                           WHERE tickers = %s)
                           """, conn, (ticker, ticker))
     return result
@@ -60,7 +60,7 @@ def positive_and_negative_count(ticker: str, conn:psycopg.Connection) -> pd.Data
                           COUNT(CASE WHEN daily_return_pct < 0
                           THEN 1
                           END) AS negative_count
-                          FROM daily_stock_prices
+                          FROM public.daily_stock_prices_with_returns
                           WHERE tickers = %s
                           GROUP BY tickers
                           """, conn, (ticker,))
@@ -106,7 +106,7 @@ def  previous_day_close(ticker: str, conn:psycopg.Connection, limit: int=50) -> 
 def get_historical_prices(ticker:str, conn:psycopg.Connection, limit: int=30) -> pd.DataFrame:
     result = db.run_query_postgres("""
                                    SELECT tickers, date, open, high, low, close, volume, daily_return_pct
-                                   FROM daily_stock_prices
+                                   FROM public.daily_stock_prices_with_returns
                                    WHERE tickers = %s
                                    ORDER BY date DESC
                                    LIMIT %s
@@ -130,7 +130,7 @@ def get_analysis_history(tickers: list, conn:psycopg.Connection):
         close AS "Close",
         volume AS "Volume",
         daily_return_pct AS "Daily Return %%"
-        FROM daily_stock_prices
+        FROM public.daily_stock_prices_with_returns
         WHERE tickers = ANY(%s)
         ORDER BY tickers, date;""", conn, (tickers,))
     return result
