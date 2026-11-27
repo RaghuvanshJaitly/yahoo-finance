@@ -3,51 +3,32 @@ from pathlib import Path
 root_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(root_dir))
 
-import database as db
+from finance_tracker import database as db
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import numpy as np
 import matplotlib.pyplot as plt
-
-#Calculate fresh daily_return values
-def calculate_daily_returns(df: pd.DataFrame) -> pd.DataFrame:
-    previous_close = df.groupby("Tickers")["Close"].shift(1)
-    df["Daily Return %"] = (((df["Close"] - previous_close) / previous_close * 100)).round(2)
-    
-    return df
+from finance_tracker import queries
+from sklearn.model_selection import train_test_split
 
 #importing data
-conn, cursor = db.connect_db()
-aapl = db.run_query("""SELECT Tickers, Date, Open,
-                    High, Low, Close, Volume, "Daily Return %"
-                          FROM daily_stock_prices
-                          WHERE Tickers = ?
-                          ORDER BY Date ASC""", conn, ("AAPL",))
-aapl = calculate_daily_returns(aapl)
+with db.connect_postgres() as conn:
+
+    aapl = queries.get_training_history("AAPL", conn)
 
 daily_return_tom = aapl["Daily Return %"].shift(-1)
 aapl["daily_return_tom"] = daily_return_tom
-aapl["Date"] = pd.to_datetime(aapl["Date"], utc=True)
-aapl["Date"] = aapl["Date"].dt.tz_convert('America/New_York')
+target_date = aapl["Date"].shift(-1)
+aapl["target_date"] = target_date
 aapl = aapl.set_index('Date')
+aapl = aapl.dropna()
+feature_columns = ["Open", "High", "Low", "Close", "Volume", "Daily Return %"]
+train, test = train_test_split(aapl, test_size=0.2, shuffle=False)
 
-#Cleaning Data
-X = aapl[['Open', 'High', 'Low', 'Close', 'Volume', 'Daily Return %']]
-y = aapl["daily_return_tom"]
-X
-X = X.iloc[1:-1]
-y = y.iloc[1:-1]
-
-#split data into 80/20 split for training and testing
-split_idx = int(len(X) * 0.8)
-
-# #feature/input
-X_train = X.iloc[:split_idx]
-#target
-y_train = y.iloc[:split_idx]
-
-X_test = X.iloc[split_idx:,]
-y_test = y.iloc[split_idx:]
+X_train = train[feature_columns]
+y_train = train["daily_return_tom"]
+X_test = test[feature_columns]
+y_test = test["daily_return_tom"]
 
     #Training
 model = LinearRegression(fit_intercept=True)

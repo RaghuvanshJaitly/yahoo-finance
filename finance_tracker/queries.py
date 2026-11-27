@@ -135,5 +135,22 @@ def get_analysis_history(tickers: list, conn:psycopg.Connection):
         ORDER BY tickers, date;""", conn, (tickers,))
     return result
 
+def get_training_history(ticker: str, conn: psycopg.Connection)-> pd.DataFrame:
+    ticker = ticker.upper()
+    result = db.run_query_postgres("""SELECT
+                                    tickers AS "Tickers",
+                                    date AS "Date",
+                                    open AS "Open",
+                                    "high" AS "High",
+                                    "low" AS "Low",
+                                    close AS "Close",
+                                    volume AS "Volume",
+                                    daily_return_pct AS "Daily Return %%"
+                                    FROM public.daily_stock_prices_with_returns
+                                    WHERE tickers = %s
+                                    ORDER BY date ASC
+                                   """, conn, (ticker,))
+    
+    return result
 if __name__ == "__main__":
     pass
